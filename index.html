@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overland — Freight and trucks, priced in the open</title>
+    <meta name="description" content="An open board for US freight. Post a load or a truck, take open bids, and deal direct. Free to use, no commission, no middleman." />
+    <meta name="author" content="Overland" />
+    <meta name="theme-color" content="#FAF9F7" />
+
+    <!-- Favicons -->
+    <!-- Listed first: browsers request /favicon.ico by default regardless of the
+         tags below, so leaving a stale one on disk overrides everything else. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Poppins:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&family=Khand:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <meta property="og:site_name" content="Overland" />
+    <meta property="og:title" content="Overland — Freight and trucks, priced in the open" />
+    <meta property="og:description" content="An open board for US freight. Post a load or a truck, take open bids, and deal direct. Free to use, no commission, no middleman." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://overland-ochre.vercel.app/og-overland.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:alt" content="Overland — freight and trucks, priced in the open." />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Overland — Freight and trucks, priced in the open" />
+    <meta name="twitter:description" content="An open board for US freight. Post a load or a truck, take open bids, and deal direct. Free to use, no commission, no middleman." />
+    <meta name="twitter:image" content="https://overland-ochre.vercel.app/og-overland.jpg" />
+      <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#FAF9F7" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SBCC86WVG0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // send_page_view is off because this is a single-page app: the initial load
+      // would fire once and every route change after it would go unrecorded.
+      // src/lib/analytics.ts sends page_view on each navigation instead.
+      gtag('config', 'G-SBCC86WVG0', { send_page_view: false });
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

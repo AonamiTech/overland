@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Overland">
+  <rect width="64" height="64" rx="14" fill="#FAF9F7"/>
+  <!-- The logo path, cropped to the two humps and scaled to fill the tile. The long
+       flat tails of the full lockup are trimmed: at 16px they collapse into the tile
+       edge and steal weight from the part that carries the identity. -->
+  <path d="M5 37 H9 C15 37 15 27 21 27 C26 27 26 34 32 34 C38 34 38 27 43 27 C49 27 49 37 55 37 H59"
+        fill="none" stroke="#111111" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

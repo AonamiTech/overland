@@ -1,0 +1,795 @@
+/* Fonts (must precede @tailwind) — Newsreader editorial serif display + Manrope UI + JetBrains Mono data; Khand kept for the wordmark */
+/* Fonts are linked from index.html, not imported here.
+   The identical Google Fonts URL used to be requested in both places, so every woff2
+   was downloaded twice. The <link> is also the better of the two: an @import is
+   render-blocking and only starts once this stylesheet has itself arrived. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Manrope', system-ui, sans-serif;
+  }
+
+  /* Data / numeric content always uses tabular mono per Aonami spec */
+  .font-mono, .tabular {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ============================================================
+   Overland premium design layer
+   ============================================================ */
+.ov-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #0E32E8;
+}
+.ov-eyebrow--muted { color: #8A8A93; }
+.ov-eyebrow .dot { width: 5px; height: 5px; border-radius: 99px; background: currentColor; }
+
+.ov-display {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.05;
+  color: #14161A;
+}
+/* blue italic accent line, as in "priced in the open." */
+.ov-ital {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  color: #1F3FD1;
+}
+.ov-copy {
+  font-family: 'Manrope', system-ui, sans-serif;
+  color: #3E3F46;
+}
+
+.ov-num {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.ov-card {
+  background: #FFFFFF;
+  border: 1px solid #E7E3DC;
+  border-radius: 18px;
+}
+.ov-card--hover { transition: border-color .2s ease, box-shadow .25s ease, transform .25s ease; }
+.ov-card--hover:hover {
+  border-color: #C9C3B8;
+  box-shadow: 0 18px 40px -24px rgba(31, 63, 209, 0.22);
+  transform: translateY(-2px);
+}
+.ov-hairline { border-color: #E7E3DC; }
+
+/* Live market table (trading terminal) */
+.ov-mkt-row { border-top: 1px solid rgba(17,17,17,.07); transition: background-color .15s ease; }
+.ov-mkt-row:hover { background: #FAF9F7; }
+.ov-spark path { vector-effect: non-scaling-stroke; }
+
+.ov-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  border-radius: 999px;
+  padding: 0.78rem 1.45rem;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ov-btn svg { transition: transform 0.18s ease; }
+.ov-btn:hover svg.arrow { transform: translateX(3px); }
+.ov-btn-ink { background: #111217; color: #fff; }
+.ov-btn-ink:hover { background: #000; transform: translateY(-1px); }
+.ov-btn-blue { background: #0E32E8; color: #fff; }
+.ov-btn-blue:hover { background: #043EDB; transform: translateY(-1px); }
+.ov-btn-outline { background: #fff; color: #111217; border-color: #D8D8DE; }
+.ov-btn-outline:hover { border-color: #111217; }
+.ov-btn-ghost { background: transparent; color: #46474D; }
+.ov-btn-ghost:hover { color: #0E32E8; }
+.ov-btn-light { background: #fff; color: #111217; }
+.ov-btn-light:hover { transform: translateY(-1px); box-shadow: 0 12px 30px -16px rgba(0,0,0,.5); }
+
+.ov-tick {
+  width: 18px; height: 18px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(14, 50, 232, 0.10); color: #0E32E8; flex-shrink: 0;
+}
+
+/* Live lane board (dark terminal) */
+.ov-board { background: #111111; border: 1px solid rgba(255,255,255,.10); border-radius: 9px; }
+.ov-board-row { border-top: 1px solid rgba(255,255,255,0.06); }
+.ov-livedot { width: 7px; height: 7px; border-radius: 999px; background: #22C55E; box-shadow: 0 0 0 0 rgba(34,197,94,.5); animation: ov-pulse 1.8s cubic-bezier(.4,0,.2,1) infinite; }
+@keyframes ov-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+  70% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+@media (prefers-reduced-motion: reduce) { .ov-livedot { animation: none; } }
+
+/* Mobile-first responsive design utilities */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+@media (max-width: 640px) {
+  .hover\:scale-102:hover {
+    transform: none; /* Disable hover effects on mobile */
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.map-background {
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(14, 50, 232, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(14, 50, 232, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  background-size: 400px 400px, 300px 300px, 100% 100%;
+  animation: float 6s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .map-background {
+    background-size: 200px 200px, 150px 150px, 100% 100%;
+  }
+}
+
+.tire-pattern {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(14, 50, 232, 0.1) 10px,
+    rgba(14, 50, 232, 0.1) 20px
+  );
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Premium animations for smooth transitions */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Enhanced float animation for logistics elements */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px) scale(1);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Reduce motion for mobile devices */
+@media (max-width: 768px) {
+  .animate-float {
+    animation: none;
+  }
+}
+
+/* New animations for bidding exchange */
+@keyframes marquee {
+  0% { 
+    transform: translate3d(0, 0, 0); 
+  }
+  100% { 
+    transform: translate3d(-50%, 0, 0); 
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-custom {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
+.animate-pulse-custom {
+  animation: pulse-custom 2s ease-in-out infinite;
+}
+
+/* Stock ticker style animations */
+@keyframes ticker-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 60s linear infinite;
+}
+
+/* Mobile-first responsive typography and spacing */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+  }
+
+  /* Mobile padding adjustments */
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .py-16 {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+
+  .py-12 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Mobile button sizes */
+  .px-8 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  .py-4 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  /* Mobile card spacing */
+  .gap-8 {
+    gap: 1rem !important;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  /* Mobile text sizes */
+  .text-5xl {
+    font-size: 2rem !important;
+    line-height: 2.25rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.75rem !important;
+    line-height: 2rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  .text-xl {
+    font-size: 1.125rem !important;
+    line-height: 1.5rem !important;
+  }
+
+  /* Mobile margin adjustments */
+  .mb-12 {
+    margin-bottom: 2rem !important;
+  }
+
+  .mb-16 {
+    margin-bottom: 3rem !important;
+  }
+
+  .mt-16 {
+    margin-top: 3rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Extra small mobile adjustments */
+  .px-6 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .py-16 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .text-5xl {
+    font-size: 1.75rem !important;
+    line-height: 2rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.75rem !important;
+  }
+
+  /* Mobile card padding */
+  .p-12 {
+    padding: 1.5rem !important;
+  }
+
+  .p-8 {
+    padding: 1rem !important;
+  }
+
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .p-4 {
+    padding: 0.75rem !important;
+  }
+}
+
+/* Touch-friendly interactive elements */
+@media (max-width: 768px) {
+  button, .cursor-pointer {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing for mobile cards */
+  .rounded-xl {
+    border-radius: 0.75rem;
+  }
+
+  .rounded-full {
+    border-radius: 9999px;
+  }
+
+  /* Mobile-friendly shadows */
+  .shadow-xl {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-2xl {
+    box-shadow: 0 15px 30px -6px rgba(0, 0, 0, 0.1), 0 6px 12px -4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 1024px) {
+  .lg\:flex {
+    display: none !important;
+  }
+
+  .lg\:hidden {
+    display: block !important;
+  }
+}
+
+/* Mobile grid improvements */
+@media (max-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile flexbox improvements */
+@media (max-width: 640px) {
+  .sm\:flex-row {
+    flex-direction: column !important;
+  }
+
+  .flex-col.sm\:flex-row {
+    flex-direction: column !important;
+  }
+
+  .space-x-4 > * + * {
+    margin-left: 0 !important;
+    margin-top: 0.75rem !important;
+  }
+
+  .space-x-8 > * + * {
+    margin-left: 0 !important;
+    margin-top: 1rem !important;
+  }
+}
+
+/* Mobile accordion improvements */
+@media (max-width: 768px) {
+  .accordion-trigger {
+    padding: 1rem 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .accordion-content {
+    padding-bottom: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+}
+
+/* Mobile badge improvements */
+@media (max-width: 640px) {
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+  }
+}
+
+/* Prevent horizontal scroll.
+   `clip`, not `hidden`: `overflow-x: hidden` on body forces overflow-y to compute as
+   `auto`, which turns body into its own scroll container and breaks `position: sticky`
+   for every descendant - the pinned ScrollStory stage releases early and leaves a gap
+   of empty page below it. `clip` blocks the same horizontal overflow without creating
+   a scroll box. */
+html, body {
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Mobile-friendly max widths */
+@media (max-width: 768px) {
+  .max-w-7xl {
+    max-width: 100% !important;
+  }
+
+  .max-w-3xl {
+    max-width: 100% !important;
+  }
+
+  .max-w-lg {
+    max-width: 100% !important;
+  }
+}
+
+
+/* ============================================================
+   Aonami design layer  (aonamitech.com)
+   Archivo Light display + Poppins body, warm off-white, 9px radii.
+   Scoped to .aon-* so it does not disturb the Overland .ov-* layer.
+   ============================================================ */
+.aon-display {
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #111111;
+}
+.aon-display--light { color: #FAF9F7; }
+
+.aon-body {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.6);
+}
+
+.aon-eyebrow {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.45);
+}
+.aon-eyebrow--accent { color: #1E4D6B; }
+
+/* Small white pill, black label - the site's only button shape */
+.aon-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  padding: 7.5px 15px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #000000;
+  text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.aon-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(17,17,17,.12); }
+.aon-cta--dark { background: #111111; color: #FAF9F7; }
+
+/* Numerals stay monospaced and tabular - rates, MC numbers and IDs must align
+   in columns regardless of which type system the rest of the page uses. */
+.aon-num {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.aon-card { background: #FFFFFF; border: 1px solid rgba(17,17,17,.08); border-radius: 9px; }
+
+/* Scene plate. `cover` fills a wide desktop frame; on a portrait phone that would
+   crop a 16:9 diorama down to a ribbon, so contain it and let the cream ground show
+   through - the render's own backdrop is near-identical, so it reads as bleed. */
+.aon-plate { object-fit: cover; }
+@media (max-width: 767px) {
+  .aon-plate {
+    object-fit: contain;
+    /* Contain letterboxes a 16:9 plate hard on a 9:19.5 screen. Bias it upward so the
+       leftover band lands under the artwork, where the copy sits, rather than as dead
+       space above it. The stage ground is matched to the render's own backdrop
+       (#E3E0DE) so the remaining letterbox reads as bleed, not as bars. */
+    object-position: center 24%;
+  }
+}
+
+/* ============================================================
+   Keyboard focus
+   Only :focus-visible, so pointer users never see a ring but keyboard
+   users always do. Uses the brand accent rather than the UA default.
+   ============================================================ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #0E32E8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Dark surfaces need the light accent to stay visible. */
+.ov-board :where(a, button, input, [tabindex]):focus-visible,
+[style*="rgb(17, 17, 17)"] :where(a, button, [tabindex]):focus-visible {
+  outline-color: #FAF9F7;
+}
+/* Never suppress it. */
+:where(a, button, input, select, textarea):focus-visible { box-shadow: none; }
+
+/* ============================================================
+   Rate ticker
+   ============================================================ */
+.ov-ticker {
+  position: relative;
+  overflow: hidden;
+  background: #111111;
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  height: 38px;
+  display: flex;
+  align-items: center;
+  /* fade the ends so items enter and leave rather than being chopped */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.ov-ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 2.75rem;
+  white-space: nowrap;
+  will-change: transform;
+  animation: ov-ticker-run 64s linear infinite;
+}
+.ov-ticker:hover .ov-ticker-track { animation-play-state: paused; }
+/* The track holds two copies, so -50% lands exactly on the seam. */
+@keyframes ov-ticker-run { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+
+.ov-ticker-item { display: inline-flex; align-items: baseline; gap: .6rem; }
+.ov-ticker-code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; letter-spacing: .06em;
+  color: rgba(255,255,255,.55);
+}
+.ov-ticker-arrow { color: rgba(255,255,255,.28); margin: 0 .3rem; }
+.ov-ticker-rate {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px; color: #FBFAF8; font-variant-numeric: tabular-nums;
+}
+.ov-ticker-delta {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px; color: #F87171;
+}
+.ov-ticker-delta[data-up="true"] { color: #4ADE80; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-ticker-track { animation: none; }
+  .ov-ticker { overflow-x: auto; }
+}
+
+/* Ghost / outline variants of the Aonami pill. */
+.aon-cta--ghost { background: transparent; color: #111111; box-shadow: inset 0 0 0 1px rgba(17,17,17,.18); }
+.aon-cta--ghost:hover { box-shadow: inset 0 0 0 1px rgba(17,17,17,.34); }
+
+/* ============================================================
+   Mobile app shell
+   Makes the phone build behave like an installed app rather than a page:
+   no rubber-band overscroll behind fixed chrome, no tap highlight, no
+   text-size inflation on rotate, and safe-area padding on notched devices.
+   ============================================================ */
+@media (max-width: 767px) {
+  html { -webkit-text-size-adjust: 100%; }
+  body { overscroll-behavior-y: none; }
+  a, button { -webkit-tap-highlight-color: transparent; }
+
+  /* Sheets and dialogs rise from the bottom like a native sheet. */
+  [role="dialog"] > div { animation: ov-sheet-up .28s cubic-bezier(.32,.72,0,1); }
+  @keyframes ov-sheet-up { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Full-bleed cards read as app rows, not as a grid of boxes. */
+  .aon-card { border-radius: 12px; }
+}
+
+@media (display-mode: standalone) {
+  /* Installed to the home screen: reclaim the browser chrome. */
+  body { padding-top: env(safe-area-inset-top); }
+}
+
+/* Scroll-story track.
+   Sized in svh to match the 100svh pinned stage inside it. Mixing vh and svh means the
+   track is measured against the address-bar-hidden viewport while the pin is measured
+   against the address-bar-shown one; the pin then releases before the track ends and a
+   white band appears under it as you scroll on a phone. The vh rule is the fallback for
+   engines without svh - slightly wrong, but never a collapsed section. */
+.ov-story-track { height: calc(var(--ov-track) * 1vh); }
+@supports (height: 1svh) {
+  .ov-story-track { height: calc(var(--ov-track) * 1svh); }
+}
+
+/* The pinned stage inside the track.
+   lvh, not svh. svh is the viewport with the address bar *shown* - the smallest it
+   gets. The moment the bar retracts the viewport grows, a 100svh stage no longer
+   reaches the bottom of the screen, and the track's cream background shows through as
+   a band under it. lvh is the largest the viewport can be, so the stage always covers
+   whatever is on screen; when the bar is showing, the surplus simply sits below the
+   fold. The track stays in svh so the scroll length does not change as the bar moves. */
+.ov-story-stage { height: 100vh; }
+@supports (height: 100lvh) {
+  .ov-story-stage { height: 100lvh; }
+}

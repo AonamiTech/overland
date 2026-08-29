@@ -1,0 +1,296 @@
+
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { CreditCard, Building, Camera, CheckCircle, Upload, AlertCircle } from "lucide-react";
+
+interface VerificationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const VerificationModal = ({ isOpen, onClose }: VerificationModalProps) => {
+  const [currentStep, setCurrentStep] = useState<'overview' | 'aadhaar' | 'pan' | 'bank' | 'selfie' | 'processing'>('overview');
+  const [verificationStatus, setVerificationStatus] = useState({
+    aadhaar: false,
+    pan: false,
+    bank: false,
+    selfie: false
+  });
+
+  const benefits = [
+    "Participate in corporate bidding",
+    "Verified badge on your profile",
+    "Access to premium truck owners",
+    "Higher priority in matching",
+    "Dedicated support line"
+  ];
+
+  const documents = [
+    { icon: CreditCard, label: "Driver's License / CDL", key: 'aadhaar' },
+    { icon: Building, label: "EIN", key: 'pan' },
+    { icon: Building, label: "Bank Account Details", key: 'bank' },
+    { icon: Camera, label: "Live Selfie", key: 'selfie' }
+  ];
+
+  const handleDocumentUpload = (docType: string) => {
+    // Simulate document upload and verification
+    setTimeout(() => {
+      setVerificationStatus(prev => ({
+        ...prev,
+        [docType]: true
+      }));
+      
+      // Move to next step or processing
+      const steps = ['aadhaar', 'pan', 'bank', 'selfie'];
+      const currentIndex = steps.indexOf(docType);
+      if (currentIndex < steps.length - 1) {
+        setCurrentStep(steps[currentIndex + 1] as any);
+      } else {
+        setCurrentStep('processing');
+      }
+    }, 2000);
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="ov-display text-xl mb-4">
+                Unlock Premium Features
+              </h3>
+              <p className="font-poppins text-gray-600 mb-6">
+                Complete these steps in 15 minutes—approval in 2–3 days.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="ov-display text-lg">Benefits</h4>
+              {benefits.map((benefit, index) => (
+                <div key={index} className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-[#0E32E8] rounded-full"></div>
+                  <span className="font-poppins text-[#3E3F46]">{benefit}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="ov-display text-lg">Required Documents</h4>
+              <div className="grid grid-cols-2 gap-4">
+                {documents.map((doc, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-[#FBFAF8] rounded-xl">
+                    <doc.icon className="w-5 h-5 text-[#0E32E8]" strokeWidth={1.8} />
+                    <span className="font-poppins text-sm text-[#3E3F46]">{doc.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              onClick={() => setCurrentStep('aadhaar')}
+              className="ov-btn ov-btn-ink w-full h-12"
+            >
+              Start Verification
+            </Button>
+          </div>
+        );
+
+      case 'aadhaar':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="ov-display text-xl mb-2">
+                Upload Driver's License / CDL
+              </h3>
+              <p className="font-poppins text-[#5B6470]">
+                Take a clear photo of your driver's license or upload from gallery
+              </p>
+            </div>
+
+            <div className="border-2 border-dashed border-[#E7E3DC] rounded-xl p-8 text-center">
+              <Upload className="w-12 h-12 text-[#A9A29A] mx-auto mb-4" strokeWidth={1.8} />
+              <p className="font-poppins text-[#5B6470] mb-4">
+                Click to upload or drag and drop your driver's license
+              </p>
+              <Button
+                onClick={() => handleDocumentUpload('aadhaar')}
+                variant="outline"
+                className="ov-btn ov-btn-outline rounded-lg"
+              >
+                Choose File
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'pan':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="ov-display text-xl mb-2">
+                Upload EIN
+              </h3>
+              <p className="font-poppins text-[#5B6470]">
+                Upload a clear photo of your EIN document
+              </p>
+            </div>
+
+            <div className="border-2 border-dashed border-[#E7E3DC] rounded-xl p-8 text-center">
+              <Upload className="w-12 h-12 text-[#A9A29A] mx-auto mb-4" strokeWidth={1.8} />
+              <Button
+                onClick={() => handleDocumentUpload('pan')}
+                variant="outline"
+                className="ov-btn ov-btn-outline rounded-lg"
+              >
+                Choose File
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'bank':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="ov-display text-xl mb-2">
+                Bank Account Verification
+              </h3>
+              <p className="font-poppins text-[#5B6470]">
+                Enter your bank details for verification
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <Input
+                placeholder="Bank Name"
+                className="h-12 border border-[#E7E3DC] rounded-lg font-poppins focus:border-[#0E32E8] focus:ring-[#0E32E8]/15 placeholder:text-[#A9A29A]"
+              />
+              <Input
+                placeholder="Account Number"
+                className="h-12 border border-[#E7E3DC] rounded-lg font-poppins focus:border-[#0E32E8] focus:ring-[#0E32E8]/15 placeholder:text-[#A9A29A]"
+              />
+              <Input
+                placeholder="Routing Number"
+                className="h-12 border border-[#E7E3DC] rounded-lg font-poppins focus:border-[#0E32E8] focus:ring-[#0E32E8]/15 placeholder:text-[#A9A29A]"
+              />
+              <Input
+                placeholder="Account Holder Name"
+                className="h-12 border border-[#E7E3DC] rounded-lg font-poppins focus:border-[#0E32E8] focus:ring-[#0E32E8]/15 placeholder:text-[#A9A29A]"
+              />
+              <Button
+                onClick={() => handleDocumentUpload('bank')}
+                className="ov-btn ov-btn-ink w-full h-12"
+              >
+                Verify Account
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'selfie':
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="ov-display text-xl mb-2">
+                Selfie Verification
+              </h3>
+              <p className="font-poppins text-[#5B6470]">
+                Take a live selfie for identity verification
+              </p>
+            </div>
+
+            <div className="border-2 border-dashed border-[#E7E3DC] rounded-xl p-8 text-center">
+              <Camera className="w-12 h-12 text-[#A9A29A] mx-auto mb-4" strokeWidth={1.8} />
+              <p className="font-poppins text-[#5B6470] mb-4">
+                Align your face within the oval and follow the prompts
+              </p>
+              <Button
+                onClick={() => handleDocumentUpload('selfie')}
+                className="ov-btn ov-btn-ink rounded-lg"
+              >
+                Capture Selfie
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'processing':
+        return (
+          <div className="space-y-6 text-center">
+            <CheckCircle className="w-16 h-16 text-[#0F7A4A] mx-auto" strokeWidth={1.8} />
+            <div>
+              <h3 className="ov-display text-xl mb-2">
+                Verification Submitted!
+              </h3>
+              <p className="font-poppins text-[#5B6470]">
+                We're verifying your documents. You'll hear from us soon!
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {documents.map((doc, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-[#FBFAF8] rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <doc.icon className="w-5 h-5 text-[#0E32E8]" strokeWidth={1.8} />
+                    <span className="font-poppins text-sm text-[#3E3F46]">{doc.label}</span>
+                  </div>
+                  <CheckCircle className="w-5 h-5 text-[#0F7A4A]" strokeWidth={1.8} />
+                </div>
+              ))}
+            </div>
+
+            <Button
+              onClick={onClose}
+              className="ov-btn ov-btn-ink w-full h-12"
+            >
+              Back to Dashboard
+            </Button>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto bg-white border border-[#E7E3DC] rounded-[20px]">
+        <DialogHeader>
+          <DialogTitle className="ov-display text-2xl">
+            Broker Verification
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Progress Bar */}
+        {currentStep !== 'overview' && currentStep !== 'processing' && (
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            {['aadhaar', 'pan', 'bank', 'selfie'].map((step, index) => (
+              <React.Fragment key={step}>
+                <div className={`ov-num w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                  verificationStatus[step as keyof typeof verificationStatus]
+                    ? 'bg-[#0F7A4A] text-white'
+                    : currentStep === step
+                      ? 'bg-[#0E32E8] text-white'
+                      : 'bg-[#F1EEE8] text-[#8B857C]'
+                }`}>
+                  {verificationStatus[step as keyof typeof verificationStatus] ? '✓' : index + 1}
+                </div>
+                {index < 3 && <div className="w-8 h-0.5 bg-[#E7E3DC]"></div>}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
+        {renderStepContent()}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default VerificationModal;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://overland-ochre.vercel.app/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/board</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/lax-phx</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/lax-dfw</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/dfw-atl</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/atl-mia</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/chi-atl</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/chi-den</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/ewr-clt</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/dfw-ewr</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/sea-slc</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/hou-msy</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/mem-chi</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/den-phx</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/sav-atl</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/lrd-sat</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/fat-sea</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://overland-ochre.vercel.app/lane/dtw-mci</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+</urlset>

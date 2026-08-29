@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Generative and answer engines - explicitly allowed. Lane pages carry FAQPage
+# schema and plain-prose answers precisely so they can be quoted.
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://overland-ochre.vercel.app/sitemap.xml
