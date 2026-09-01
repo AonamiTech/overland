@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth, type Role, type AccountType } from '@/auth/AuthContext';
 import { US_STATES, CITIES_BY_STATE, DIAL_CODES, digitsOnly, isValidPhone, isValidZip } from '@/lib/geo';
 
@@ -34,6 +34,14 @@ export default function CompleteProfile() {
   const [err, setErr] = useState<string | null>(null);
   const [skipped, setSkipped] = useState(false);
 
+  /* Escape dismisses, matching every other dialog here. Registered before the
+     early return so the hook order stays stable across renders. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSkipped(true); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
   const incomplete = !!user && (!user.phone || !user.city);
   if (loading || !user || !incomplete || skipped) return null;
 
@@ -65,7 +73,19 @@ export default function CompleteProfile() {
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto sm:items-center"
          style={{ background: 'rgba(17,17,17,.5)' }}>
-      <div className="my-6 w-full max-w-[440px] rounded-t-[16px] bg-white p-7 sm:rounded-[9px]">
+      <div className="relative my-6 w-full max-w-[440px] rounded-t-[16px] bg-white p-7 sm:rounded-[9px]">
+        {/* Same dismissal as "I'll do this later", in the place people look for it.
+            The step is genuinely optional - it is skippable either way - so leaving
+            only a text link at the bottom made it read as a wall. */}
+        <button
+          type="button"
+          onClick={() => setSkipped(true)}
+          aria-label="Close"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgba(17,17,17,.06)]"
+          style={{ color: 'rgba(17,17,17,.45)', fontSize: 20, lineHeight: 1 }}
+        >
+          &times;
+        </button>
         <span className="aon-eyebrow" style={{ color: ACCENT }}>One more step</span>
         <h2 className="aon-display mt-2 text-[24px]">
           {user.name ? `Welcome, ${user.name.split(' ')[0]}.` : 'Almost there.'}

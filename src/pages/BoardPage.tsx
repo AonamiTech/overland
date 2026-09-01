@@ -50,6 +50,7 @@ export default function BoardPage() {
   const [clock, setClock] = useState(() => new Date());
   const [open, setOpen] = useState<Lane | null>(null);
   const [posting, setPosting] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { slug } = useParams();
 
   /* A shared /lane/lax-dfw link should land on that lane's detail, not the bare board. */
@@ -202,39 +203,82 @@ export default function BoardPage() {
 
         <LiveListings />
 
-        {/* ---- filters ----------------------------------------------------- */}
-        <div className="mt-14">
-          <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>
-            Reference rates · simulated
-          </span>
-          <h2 className="aon-display mt-2 text-[clamp(24px,3vw,34px)]">Lane index</h2>
-          <p className="aon-body mt-2 max-w-[52ch] text-[13px] leading-[1.6]">
-            Indicative rates modelled from miles and equipment, not live transactions.
-            Use them to sanity-check a bid, not as a quote.
-          </p>
-        </div>
+        {/* ---- lane index header ------------------------------------------- */}
+        {/* Heading left, the two things you came to do on the right. The filter
+            panel this replaced put four dropdowns, a search field and a pill row
+            above the table before you had seen a single lane. */}
+        <div className="mt-14 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>
+              Reference rates · simulated
+            </span>
+            <h2 className="aon-display mt-2 text-[clamp(24px,3vw,34px)]">Lane index</h2>
+          </div>
 
-        {/* search + filters */}
-        <div className="mt-6 rounded-[9px] p-4" style={{ background: '#FFFFFF', border: `1px solid ${HAIR}` }}>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="w-full">
+          <div className="flex items-center gap-2">
+            <div className="w-[min(340px,58vw)]">
               <SmartSearch
                 value={q}
                 onChange={setQ}
                 onParsed={(p) => {
                   setAi(p);
-                  // A parsed query drives the real filter controls, so the user can see
-                  // and adjust what it did rather than trusting a black box.
+                  // A parsed query drives the real controls, so the reader can see and
+                  // adjust what it did rather than trusting a black box.
                   if (p?.originCode) setOrigin(p.originCode);
                   if (p?.destCode) setDest(p.destCode);
                   if (p?.equipment) setEquip(p.equipment as Equipment);
                   if (p?.maxRate) setMaxMiles('');
+                  // Open the panel when a query set something, so the reader can see
+                  // what the parser did instead of the filters changing invisibly.
+                  if (p?.originCode || p?.destCode) setFiltersOpen(true);
                 }}
               />
             </div>
+            <button type="button" onClick={() => setPosting(true)} className="aon-cta aon-cta--dark whitespace-nowrap">
+              Post
+            </button>
           </div>
+        </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+        <p className="aon-body mt-2 max-w-[52ch] text-[13px] leading-[1.6]">
+          Indicative rates modelled from miles and equipment, not live transactions.
+          Use them to sanity-check a bid, not as a quote.
+        </p>
+
+        {/* ---- equipment + count, with the rest folded away ------------------ */}
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          {(['All', 'Dry van', 'Reefer', 'Flatbed'] as const).map((e) => (
+            <button key={e} type="button" onClick={() => setEquip(e)}
+                    className="aon-eyebrow rounded-full px-4 py-2 transition-colors"
+                    style={{ background: equip === e ? INK : 'transparent',
+                             color: equip === e ? '#FBFAF8' : 'rgba(17,17,17,.55)',
+                             border: `1px solid ${equip === e ? INK : HAIR}` }}>
+              {e}
+            </button>
+          ))}
+
+          <button type="button" onClick={() => setFiltersOpen((v) => !v)}
+                  aria-expanded={filtersOpen}
+                  className="aon-eyebrow rounded-full px-4 py-2 transition-colors"
+                  style={{ color: activeCount > 0 ? ACCENT : 'rgba(17,17,17,.55)',
+                           border: `1px solid ${activeCount > 0 ? ACCENT : HAIR}` }}>
+            Filters{activeCount > 0 ? ` · ${activeCount}` : ''} {filtersOpen ? '\u2191' : '\u2193'}
+          </button>
+
+          {activeCount > 0 && (
+            <button type="button" onClick={clearAll} className="aon-eyebrow" style={{ color: ACCENT }}>
+              Clear
+            </button>
+          )}
+
+          <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+            {rows.length} of {lanes.length} lanes
+          </span>
+        </div>
+
+        {filtersOpen && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-[9px] p-3"
+               style={{ background: '#FFFFFF', border: `1px solid ${HAIR}` }}>
             <select value={origin} onChange={(e) => setOrigin(e.target.value)} aria-label="Origin"
                     className="rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
                     style={{ fontFamily: 'Poppins, sans-serif', background: 'rgba(17,17,17,.04)', border: `1px solid ${HAIR}` }}>
@@ -256,27 +300,7 @@ export default function BoardPage() {
                    className="aon-num w-[110px] rounded-[9px] px-3 py-2.5 text-[14px] outline-none"
                    style={{ background: 'rgba(17,17,17,.04)', border: `1px solid ${HAIR}` }} />
           </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {(['All', 'Dry van', 'Reefer', 'Flatbed'] as const).map((e) => (
-              <button key={e} type="button" onClick={() => setEquip(e)}
-                      className="aon-eyebrow rounded-full px-4 py-2 transition-colors"
-                      style={{ background: equip === e ? INK : 'transparent',
-                               color: equip === e ? '#FBFAF8' : 'rgba(17,17,17,.55)',
-                               border: `1px solid ${equip === e ? INK : HAIR}` }}>
-                {e}
-              </button>
-            ))}
-            {activeCount > 0 && (
-              <button type="button" onClick={clearAll} className="aon-eyebrow ml-1" style={{ color: ACCENT }}>
-                Clear {activeCount} filter{activeCount === 1 ? '' : 's'}
-              </button>
-            )}
-            <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.34)' }}>
-              {rows.length} of {lanes.length} lanes
-            </span>
-          </div>
-        </div>
+        )}
 
         {/* ---- the board --------------------------------------------------- */}
         <div className="mt-4 overflow-x-auto">
