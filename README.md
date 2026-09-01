@@ -144,10 +144,20 @@ one screen is the most common visual bug in this repo.** Read
   **Client Secret in the Supabase provider settings does not match** Google Cloud
   Console. A failed return now disables the button on that device and clears
   itself once a sign-in succeeds, so fixing the secret needs no redeploy.
-- `profiles` and `listings` are empty in production. Accounts exist in
-  `auth.users`, so either nothing writes a profile row on signup or RLS blocks the
-  anon read — unresolved, and it means carrier identity cannot render for real
-  users.
+- **Anonymous clients read nothing.** `listings`, `bids` and `profiles` all return
+  zero rows without a session — RLS has no anon SELECT policy. Signed-in users see
+  each other's data correctly, so the marketplace works; but any public "browse
+  loads" page would render empty.
+- **Posting a load from the UI can silently fail.** The dialog closes with no error
+  and no row is created. Reproduced during the September audit.
+- **Self-bidding is not blocked.** A listing owner can bid on their own load, which
+  poisons the public bid record the product is built on. `0002_harden.sql` declares
+  the constraint, so it appears never to have been applied.
+- **Bids cannot be withdrawn.** `DELETE` returns 204 and removes nothing — there is
+  no delete policy, so deny-by-default silently wins.
+- **The board header shows simulated figures next to real ones.** "Open loads" and
+  "Bids today" are computed from the seeded lane model, so the page can claim 143
+  open loads directly above a board holding one.
 - The `news` and `ai-search` edge functions are written but **not deployed**.
 
 ---

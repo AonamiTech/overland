@@ -243,7 +243,10 @@ records it as the top risk rather than hiding it.
 
 | Item | State |
 | --- | --- |
-| Profile rows on signup | **Broken.** `auth.users` populates, `profiles` stays empty, so carrier identity cannot render for real users. Root cause unresolved |
+| Posting from the UI | **Broken.** The dialog closes without error and no row is created |
+| Self-bid prevention | **Broken.** An owner can bid on their own listing; `0002_harden.sql` appears not to have been applied |
+| Bid withdrawal | **Missing.** `DELETE` is denied by default and returns 204 having removed nothing |
+| Anonymous reads | **By design, but unhandled.** No anon SELECT policy, so any public browse view renders empty |
 | Google sign-in | **Broken.** Provider Client Secret mismatch in Supabase. Outbound leg verified correct |
 
 ### Should have
