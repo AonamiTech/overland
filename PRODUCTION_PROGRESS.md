@@ -88,3 +88,35 @@ complete without being applied — `0002_harden.sql` failed the same way, which 
 why self-bidding reached production.
 
 Writing a migration changes nothing. Applying it does.
+
+### Resolved after verification
+
+Migrations applied with `supabase db push`. All five now show a populated Remote
+column. Confirmed against the live database with the anon key alone:
+
+```
+listings          1 row      readable
+profiles         13 rows     readable
+bids              query authorised, 0 rows present
+profile_contacts  42501 permission denied   ← the privacy boundary held
+reports           42501 permission denied   ← insert-only, as designed
+listings.expires_at / .hidden   present, expiry populated
+```
+
+Deployed with `vercel --prod`. Every legacy path now returns **410**;
+`/`, `/board`, `/privacy`, `/terms`, `/lane/:slug` and `/api/diesel` all 200;
+zero occurrences of the forbidden vocabulary in the served HTML.
+
+**The repository is not connected to Vercel.** Every deployment in the project's
+history is a manual CLI push. Committing and pushing to GitHub ships nothing,
+which is why twelve tasks sat undeployed. Connect the Git integration in the
+Vercel dashboard, or deployment stays a step someone has to remember.
+
+### Still open
+
+- **Task 7 remains undone.** The five RLS integration tests still fail with
+  `permission denied` — they authenticate as anon, which cannot insert. They need
+  two seeded users and real sessions.
+- **Accessibility.** The lane page shows 4 elements below 3:1 in dark mode. This
+  is the pre-existing baseline, not the reverted regression, and is the remaining
+  half of Task 11.
