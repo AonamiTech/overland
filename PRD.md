@@ -243,10 +243,9 @@ records it as the top risk rather than hiding it.
 
 | Item | State |
 | --- | --- |
-| Posting from the UI | **Broken.** The dialog closes without error and no row is created |
-| Self-bid prevention | **Broken.** An owner can bid on their own listing; `0002_harden.sql` appears not to have been applied |
-| Bid withdrawal | **Missing.** `DELETE` is denied by default and returns 204 having removed nothing |
-| Anonymous reads | **By design, but unhandled.** No anon SELECT policy, so any public browse view renders empty |
+| Google sign-in | **Broken.** Provider Client Secret mismatch in Supabase. Outbound leg verified correct |
+| Anonymous reads | **By design, unhandled.** Every policy is `to authenticated`, so a signed-out client reads zero rows. The board is auth-gated, so this bites only if a public browse view is added |
+| Notifications | **Missing.** Nothing tells a poster a bid arrived, or a bidder they were accepted |
 | Google sign-in | **Broken.** Provider Client Secret mismatch in Supabase. Outbound leg verified correct |
 
 ### Should have
@@ -331,7 +330,9 @@ quick-pay and factoring.
 
 ## 11. Open questions
 
-1. Why are `profiles` rows not being created on signup? Blocks carrier identity.
+1. ~~Why are `profiles` rows not created on signup?~~ **Answered 1 Sep:** they are.
+   Thirteen exist. Every RLS policy is `to authenticated`, so an anonymous query
+   returns zero rows and reads as an empty table.
 2. Will small shippers post to a board where every bid is public? **Twenty
    interviews — ten shippers, ten brokers — answers this in three weeks and should
    precede further building.**
@@ -370,7 +371,84 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 
 ---
 
-## 13. Related
+---
+
+## 13. Implementation log
+
+What has actually been built, and how. Kept in reverse order so the newest entry is
+first. Anything asserted here was verified against production, not assumed.
+
+### 1 Sep 2026 — audit fixes
+
+Ran the platform as two real users against production and fixed what broke.
+
+**Migrations were never applied.** `supabase migration list --linked` showed an empty
+Remote column for all three — the schema had been created by hand in the SQL editor,
+so the history table was empty and `0002_harden.sql` had never run. Applied all three
+with `supabase db push --include-all`; `0001` replays safely because every
+`create policy` is preceded by a `drop policy if exists`.
+
+That single action closed two findings:
+
+| Was | Now |
+| --- | --- |
+| Owner could bid on their own listing (`HTTP 201`) | `HTTP 403` |
+| Bids could not be withdrawn — `DELETE` returned 204 and removed nothing | Withdrawal works; verified 0 rows remaining |
+
+**Posting could report success while writing nothing.** The branch read
+`isLive() && user`, so a missing session fell through to the local-storage path meant
+for demo mode *and still showed the success screen*. The listing existed only in that
+browser. There is now no fallback while a backend is configured: no session raises an
+error the poster can act on.
+
+**The header printed simulated figures beside real ones** — `Open loads 143` directly
+above a board holding one, because the counts came from the seeded lane model. Added
+`boardCounts()` in `lib/db.ts`, a `head: true, count: 'exact'` query so no rows cross
+the wire, and the header shows a dash while it resolves rather than a fabricated
+number. Verified live: header reads `Open loads 1` above `1 listing`.
+
+**Ready dates accepted the past.** A live listing was advertising a date that had
+already gone. The picker now floors at today.
+
+### 1 Sep 2026 — lane index simplified
+
+The lane index opened with a search field, four dropdowns and a pill row stacked in a
+card above the table, so the reader met the controls before a single lane. Now a
+header row — heading left, search and Post right — with equipment pills and the lane
+count beneath, and the dropdowns folded behind a Filters toggle that shows how many
+are active. A parsed smart-search query opens that panel rather than changing hidden
+filters, which was the point of surfacing them.
+
+`CompleteProfile` gained the corner close and Escape that every other dialog has. The
+step was already optional, but with only a text link at the foot it read as a wall.
+
+### 31 Aug 2026 — auth restructured around what works
+
+Email sign-up and sign-in were verified end to end; Google fails on the return leg
+with `Unable to exchange external code`, a provider credential mismatch that cannot be
+fixed from the application. So the working path leads: the email form is open by
+default and Google sits below it behind an "or" divider.
+
+A failed Google return records itself in `localStorage` and stops offering the button
+on that device, clearing itself once a sign-in succeeds — so fixing the secret needs
+no redeploy. `VITE_GOOGLE_AUTH=off` hides it globally.
+
+Two upstream bugs were fixed to get there: `getSupabase()` cached the client rather
+than the promise, so concurrent callers each built their own `GoTrueClient` on one
+storage key — fatal under PKCE, where one instance writes the verifier and another
+reads it. And email links return tokens in the URL *fragment*, which `flowType: 'pkce'`
+ignores, so every confirmation landed signed-out with a valid session unread in the
+address bar.
+
+### 30 Aug 2026 — mobile
+
+Phones get the unpinned telling: no sticky stage, no scroll-scrubbed video. Clips play
+in view via an `IntersectionObserver` and pause on exit, using the `-m` encodes only.
+Page weight fell from ~2500 KB to ~1035 KB, and the address-bar resize that produced
+white bands under the pinned stage cannot occur because nothing is pinned.
+
+
+## 14. Related
 
 [README.md](README.md) · [DESIGN.md](DESIGN.md) · [LEGAL-NOTES.md](LEGAL-NOTES.md) ·
 [supabase/SETUP.md](supabase/SETUP.md)
