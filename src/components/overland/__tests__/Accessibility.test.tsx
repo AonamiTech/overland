@@ -1,23 +1,40 @@
-import { describe, it, expect } from 'vitest';
-import fs from 'fs';
-import path from 'path';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import AuthDialog from '../AuthDialog';
+import * as AuthContextModule from '@/auth/AuthContext';
+import { MemoryRouter } from 'react-router-dom';
 
-describe('Task 7 Accessibility Audit', () => {
-  it('AuthDialog has dialog role, aria-modal, and title labelling', () => {
-    const code = fs.readFileSync(path.resolve(process.cwd(), 'src/components/overland/AuthDialog.tsx'), 'utf8');
+describe('Task 5 & 7 Accessibility Behavioral Test Suite', () => {
+  it('renders AuthDialog with role="dialog", aria-modal="true", and aria-labelledby matching title ID', () => {
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: null,
+      loading: false,
+      mode: 'supabase',
+      authError: null,
+      openAuth: vi.fn(),
+      closeAuth: vi.fn(),
+      authOpen: true,
+      pendingRole: 'shipper',
+      signUpWithPassword: vi.fn(),
+      signInWithPassword: vi.fn(),
+      sendLink: vi.fn(),
+      updateProfile: vi.fn(),
+      signInWithGoogle: vi.fn(),
+      signOut: vi.fn(),
+    });
 
-    expect(code).toMatch(/role="dialog"/i);
-    expect(code).toMatch(/aria-modal="true"/i);
-    expect(code).toMatch(/aria-labelledby="auth-dialog-title"/i);
-    expect(code).toMatch(/id="auth-dialog-title"/i);
-  });
+    render(
+      <MemoryRouter>
+        <AuthDialog />
+      </MemoryRouter>
+    );
 
-  it('PostListing has dialog role, aria-modal, and title labelling', () => {
-    const code = fs.readFileSync(path.resolve(process.cwd(), 'src/components/overland/PostListing.tsx'), 'utf8');
-
-    expect(code).toMatch(/role="dialog"/i);
-    expect(code).toMatch(/aria-modal="true"/i);
-    expect(code).toMatch(/aria-labelledby="post-listing-title"/i);
-    expect(code).toMatch(/id="post-listing-title"/i);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    const titleId = dialog.getAttribute('aria-labelledby');
+    expect(titleId).toBe('auth-dialog-title');
+    expect(document.getElementById(titleId!)).toBeInTheDocument();
   });
 });

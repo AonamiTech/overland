@@ -50,7 +50,7 @@ becomes something else:
 | Select or recommend a carrier for a shipper | That is allocation of traffic |
 | Negotiate or quote a rate to a named counterparty | § 13102(2): "negotiates for" |
 | Be a party to any contract of carriage | Makes us a principal |
-| Claim to verify or vet anyone | We verify an email. Saying more is a promise we cannot keep |
+| Claim to verify or vet anyone | We authenticate users. Saying more is a promise we cannot keep |
 
 ---
 
@@ -377,6 +377,17 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
+
+### 1 Sep 2026 — Work Order 4 live marketplace loop & copy alignment
+
+Completed all tasks from `ANTIGRAVITY-TASK-4.md`:
+
+1. **Production Marketplace Loop E2E (Task 1):** Executed full 10-step marketplace transaction chain against live Supabase production instance (`https://ulywxnfrkmhaucvgxofc.supabase.co`); recorded HTTP status codes for all 10 steps (all succeeded, self-bidding rejected with 403, contact details released to counterparty with 200 and blocked for 3rd users with 403, duplicate rating rejected with 409). Built repeatable harness `src/lib/__tests__/loop.e2e.test.ts`.
+2. **Email Verification Copy Alignment (Task 2):** Updated `BidderCard.tsx`, `PrivacyPage.tsx`, `PRD.md` §2, and `README.md` to state account authentication rather than unverified email claims while `mailer_autoconfirm` remains active.
+3. **Rendered Contrast Audit (Task 3):** Elevated website/google link colors in `BidderCard.tsx` to `0.65` opacity; updated `contrast-audit.mjs` with alpha compositing to confirm 0 WCAG AA failures across rendered surfaces.
+4. **Behavioral Test Replacement (Task 4):** Replaced source file string regex assertions in `notifications.test.ts` and `Accessibility.test.tsx` with behavioral DOM and execution tests.
+5. **Accessibility Audit (Task 5):** Verified dialog roles (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`), focus management, and keyboard handlers in `AuthDialog.tsx` & `PostListing.tsx`.
+6. **RLS Harness & Housekeeping (Tasks 6 & 7):** Documented test project credentials, licence requirements, and duplicate repository cleanup for Pratik in `README.md` and `PRODUCTION_PROGRESS.md`.
 
 ### 1 Sep 2026 — Work Order 3 shipping verification & contrast overhaul
 

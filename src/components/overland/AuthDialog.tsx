@@ -162,9 +162,6 @@ export default function AuthDialog() {
       className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4"
       style={{ background: 'rgba(17,17,17,.42)' }}
       onClick={closeAuth}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Sign in to Overland"
     >
       {/* The signup form is taller than a phone screen once the password field and the
           carrier numbers are showing, and the panel had no height cap - so the heading

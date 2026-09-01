@@ -42,9 +42,8 @@ const onBoard = (t: number) => {
 export function BidderDisclaimer() {
   return (
     <p className="mt-3 text-[11px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
-      Names, MC/USDOT numbers and websites are self-declared — Overland verifies an email
-      address and nothing more. SAFER is the FMCSA&rsquo;s own register: check anyone there
-      before you move freight.
+      Names, MC/USDOT numbers and websites are self-declared. SAFER is the FMCSA&rsquo;s own register:
+      check anyone there before you move freight.
     </p>
   );
 }
@@ -131,7 +130,7 @@ export default function BidderCard({ info, onOpenProfile, onReport }: { info: Bi
             className="rounded-[6px] px-2 py-[3px] text-[10.5px]"
             style={{
               fontFamily: 'Poppins, sans-serif',
-              color: l.weight === 'verify' ? ACCENT : 'rgba(17,17,17,.5)',
+              color: l.weight === 'verify' ? ACCENT : 'rgba(17,17,17,.65)',
               background: l.weight === 'verify' ? 'rgba(30,77,107,.07)' : 'transparent',
               border: `1px solid ${l.weight === 'verify' ? 'rgba(30,77,107,.22)' : HAIR}`,
             }}

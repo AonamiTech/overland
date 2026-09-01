@@ -42,7 +42,7 @@ export default function PrivacyPage() {
         <S n="02" title="Why we collect it">
           <p>We use your information strictly for the following purposes:</p>
           <ul className="ml-4 list-disc space-y-1">
-            <li>To verify your email address and authorize access to the board;</li>
+            <li>To authenticate account credentials and authorize access to the board;</li>
             <li>To display open freight listings and lane index rates publicly;</li>
             <li>To share direct contact details (email and phone) between a shipper and carrier when both sides accept a bid;</li>
             <li>To enforce platform abuse controls and prevent fraudulent postings.</li>

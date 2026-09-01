@@ -130,51 +130,23 @@ src/
   pages/                 Index · BoardPage
   test/                  Persona-driven tests
 supabase/
-  migrations/            0001_init · 0002_harden · 0003_website
-  functions/             news · send-deal-email (Deno)
+npm run dev
 ```
 
-Two design layers coexist in `src/index.css`: `.aon-*` is current and owns the
-product surfaces, `.ov-*` is legacy and owns ~24 older routes. **Mixing them on
-one screen is the most common visual bug in this repo.** Read
-[DESIGN.md](DESIGN.md) before writing UI.
+---
+
+## Verification
+
+```bash
+npm run typecheck       # tsc -b — the ONLY real type check
+npm run test            # vitest run
+npm run build           # vite build
+npm run verify:shipped  # local pre-report shipping gate
+```
 
 ---
 
-## Docs
+## Licence & Housekeeping
 
-| File | What it covers |
-|---|---|
-| [PRD.md](PRD.md) | What the product is, who it serves, and what is in and out of scope |
-| [PROD-READINESS.md](PROD-READINESS.md) | What blocks a production launch, in priority order |
-| [AUDIT-BRIEF.md](AUDIT-BRIEF.md) | Open bugs, missing test coverage, and the work order for fixing them |
-| [DESIGN.md](DESIGN.md) | The design system, the two layers, and the footguns that have actually bitten |
-| [LEGAL-NOTES.md](LEGAL-NOTES.md) | Broker-status boundary and what must never be built |
-| [supabase/SETUP.md](supabase/SETUP.md) | Database setup and migrations |
-| [supabase/EMAIL-TEMPLATES.md](supabase/EMAIL-TEMPLATES.md) | Auth email copy |
-| [HANDOVER.md](HANDOVER.md) | Current state and open threads |
-
----
-
-## Known state
-
-**Production Readiness Floor Established (Completed Tasks 1–12):**
-
-- **Legacy Surface Deleted (Task 1):** Removed 24 legacy routes and components advertising commission/escrow/insurance. Added `410 Gone` rewrites in `vercel.json` and automated language guard script `scripts/check-language.sh`.
-- **Continuous Integration (Task 2):** Added GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing typecheck, tests, build, and language compliance on `main`.
-- **Error & Uptime Monitoring (Task 3):** Added `@sentry/react` (conditional on `VITE_SENTRY_DSN`), `ErrorBoundaryFallback` component, sourcemap uploads, and `/api/diesel?health=1` endpoint health check.
-- **Abuse Controls & Expiry (Task 4):** Enforced Postgres insert rate limits (20 listings/hr, 60 bids/hr), 14-day `expires_at`, `hidden` moderation flags, `reports` table with RLS, and UI `ReportModal`.
-- **Privacy Policy (Task 5):** Published `/privacy` with clear data collection, counterparty release rules, retention, and deletion request info (`privacy@overland.com`).
-- **Open Anonymous Reads (Task 6):** Applied `0005_anon_read.sql` granting anonymous read access to open listings, bids, and public profiles, keeping `profile_contacts` strictly locked.
-- **RLS Test Harness Repaired (Task 7):** Repaired `src/lib/__tests__/db.policies.test.ts` with schema validation tests and graceful integration test support.
-- **Email Notifications (Task 8):** Deployed `send-deal-email` Edge Function in `supabase/functions/send-deal-email/` with safe fallback when SMTP keys are absent.
-- **Transactional Auth Email (Task 9):** Documented Custom SMTP and Domain DNS setup (`auth@overland.com`) in `supabase/SETUP.md`.
-- **Funnel Instrumentation (Task 10):** Implemented five cookieless funnel events (`landing`, `signup_started`, `signup_completed`, `first_action`, `deal_accepted`) guarded on environment variables.
-- **Performance & Cleanup (Task 11):** `theme.css` was imported into `main.tsx` and then removed — it broke dark mode (147 elements below 3:1, several invisible), because `index.css` hardcodes light values. The file was subsequently deleted. `ai-search` was dropped; `news` is deployed and kept.
-- **Documentation Updated (Task 12):** Updated `PRD.md`, `README.md`, `DESIGN.md`, and `.env.example`.
-
----
-
-## Licence
-
-None yet. All rights reserved until one is chosen.
+- **Licence (NEEDS PRATIK):** None yet. All rights reserved until an open source or proprietary licence is chosen by Pratik.
+- **Duplicate Repository (NEEDS PRATIK):** The empty duplicate repository at `pratikkpp24/overland` should be deleted on GitHub.
