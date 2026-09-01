@@ -105,6 +105,19 @@ npm run lint
 `"files": []`, so a bare `--noEmit` type-checks nothing and passes silently. Only
 `tsc -b` walks the project references.
 
+### Operator Moderation & Reports
+User reports filed via `ReportModal` land in `public.reports`. To preserve reporter privacy, client `SELECT` is denied via RLS (insert-only for authenticated users).
+
+Operators read and audit reports using the Supabase SQL Editor or `service_role` connection:
+```sql
+-- View all submitted reports with reporter name
+select r.id, r.created_at, r.subject_type, r.subject_id, r.reason, p.name as reporter_name
+from public.reports r
+left join public.profiles p on r.reporter_id = p.id
+order by r.created_at desc;
+```
+To hide a reported listing or bid, set `hidden = true` on the target row in `public.listings` or `public.bids`.
+
 ---
 
 ## Layout
