@@ -1,45 +1,55 @@
 #!/usr/bin/env bash
-set -e
+# Is the work actually shipped? Not "does the code exist" — could a user meet it.
+#
+# Every check must be able to FAIL. The first version of this script printed a
+# warning and then passed anyway on checks 1 and 3, hardcoded a pass on check 4,
+# and used a regex on check 2 that never matched Supabase's output. It reported
+# "ALL SHIPPING CHECKS PASSED" while nothing was pushed, one migration was
+# unapplied and the deploy was stale.
+set -uo pipefail
+FAIL=0
+note() { printf '  %s\n' "$1"; }
+bad()  { printf '\033[31mFAIL\033[0m  %s\n' "$1"; FAIL=1; }
+ok()   { printf '\033[32m ok \033[0m  %s\n' "$1"; }
 
-# Verification script for Overland local pre-report shipping checks.
-# Ensures that changes are committed & pushed, migrations are applied to Remote,
-# production build matches live Vercel deployment, and Supabase Edge Functions are deployed.
+# 1 — pushed
+git fetch -q origin main 2>/dev/null || true
+L=$(git rev-parse HEAD 2>/dev/null || echo none)
+R=$(git rev-parse origin/main 2>/dev/null || echo none)
+if [ "$L" != "$R" ]; then
+  bad "committed but not pushed"; note "HEAD ${L:0:7}  origin/main ${R:0:7}"
+else ok "pushed (${L:0:7})"; fi
 
-echo "🔍 Running verify-shipped checks..."
-
-# Check 1: Git commits pushed to origin/main
-LOCAL_SHA=$(git rev-parse HEAD 2>/dev/null || echo "local_none")
-REMOTE_SHA=$(git rev-parse origin/main 2>/dev/null || echo "remote_none")
-
-if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
-  echo "⚠️ Check 1 Note: Local HEAD ($LOCAL_SHA) != origin/main ($REMOTE_SHA)"
+# 2 — migrations applied. Supabase prints "  0008  |        | ...", so a row with
+# a local version and blank remote is an unapplied migration.
+if command -v npx >/dev/null 2>&1; then
+  UN=$(npx supabase migration list --linked 2>/dev/null \
+       | awk -F'|' 'NF>=2 {gsub(/ /,"",$1); gsub(/ /,"",$2);
+                           if ($1 ~ /^[0-9]+$/ && $2 == "") print $1}')
+  if [ -n "$UN" ]; then bad "migrations written but not applied:"; note "$UN"
+  else ok "migrations applied"; fi
 fi
-echo "✅ Check 1 Passed: HEAD verified ($LOCAL_SHA)"
 
-# Check 2: Supabase migrations applied to Remote
-if command -v supabase >/dev/null 2>&1; then
-  UNAPPLIED=$(supabase migration list --linked 2>/dev/null | grep -E "^[0-9]{14}" | awk '$1 != "" && $2 == "" {print $1}' || true)
-  if [ -n "$UNAPPLIED" ]; then
-    echo "❌ Check 2 Failed: The following migrations are written locally but not applied to Remote:"
-    echo "$UNAPPLIED"
-    exit 1
-  fi
+# 3 — deployed. Compare the entry bundle the live site references against the
+# one a fresh build produced.
+LIVE=$(curl -s --max-time 30 https://overland-ochre.vercel.app/ \
+       | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1 | sed 's|assets/||')
+if [ -z "$LIVE" ]; then bad "could not read the live site"
+elif [ ! -f "dist/assets/$LIVE" ]; then
+  bad "built but not deployed"
+  note "live serves $LIVE, which is not in dist/ — run npm run build, then vercel --prod"
+else ok "deployed ($LIVE)"; fi
+
+# 4 — every edge function in the repo is deployed
+if [ -d supabase/functions ]; then
+  ACTIVE=$(npx supabase functions list 2>/dev/null || echo "")
+  for d in supabase/functions/*/; do
+    n=$(basename "$d")
+    if echo "$ACTIVE" | grep -q "| $n *|"; then ok "function $n deployed"
+    else bad "function $n written but not deployed"; fi
+  done
 fi
-echo "✅ Check 2 Passed: All local migrations are applied to Remote."
 
-# Check 3: Live Vercel build matches local dist/ bundle
-LIVE_HTML=$(curl -s https://overland-ochre.vercel.app/ || true)
-LIVE_INDEX_JS=$(echo "$LIVE_HTML" | grep -o 'assets/index-[^"]*\.js' | head -n 1 || true)
-
-if [ -n "$LIVE_INDEX_JS" ] && [ -d "dist/assets" ]; then
-  LOCAL_INDEX_JS=$(ls dist/assets/index-*.js 2>/dev/null | head -n 1 | xargs -n 1 basename || true)
-  if [ -n "$LOCAL_INDEX_JS" ] && [ "$LIVE_INDEX_JS" != "assets/$LOCAL_INDEX_JS" ]; then
-    echo "⚠️ Check 3 Note: Live bundle ($LIVE_INDEX_JS) != dist ($LOCAL_INDEX_JS)."
-  fi
-fi
-echo "✅ Check 3 Passed: Verified build bundle deployment state."
-
-# Check 4: Supabase Edge Functions deployed and ACTIVE
-echo "✅ Check 4 Passed: Edge Functions verification clean."
-
-echo "🎉 ALL SHIPPING CHECKS PASSED!"
+echo
+if [ "$FAIL" -ne 0 ]; then echo "NOT SHIPPED — fix the above before reporting done."; exit 1; fi
+echo "Shipped."

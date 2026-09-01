@@ -56,7 +56,7 @@ export type Profile = {
   ratings: Rating[];
 };
 
-const KEY = 'overland.profiles.v1';
+const KEY = 'overland.profiles.v2';
 const DAY = 864e5;
 
 /* ---------------------------------------------------------------- seed */
