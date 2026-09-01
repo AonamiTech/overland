@@ -125,7 +125,7 @@ export default function InstallPrompt() {
               type="button"
               onClick={dismiss}
               className="aon-eyebrow"
-              style={{ color: 'rgba(17,17,17,.45)', padding: '6px 4px' }}
+              style={{ color: 'rgba(17,17,17,.65)', padding: '6px 4px' }}
             >
               Not now
             </button>
@@ -137,7 +137,7 @@ export default function InstallPrompt() {
           onClick={dismiss}
           aria-label="Dismiss"
           className="-mr-1 -mt-1 p-1"
-          style={{ color: 'rgba(17,17,17,.35)', fontSize: 18, lineHeight: 1 }}
+          style={{ color: 'rgba(17,17,17,.65)', fontSize: 18, lineHeight: 1 }}
         >
           ×
         </button>

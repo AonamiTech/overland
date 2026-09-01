@@ -378,6 +378,17 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
 
+### 1 Sep 2026 — Work Order 3 shipping verification & contrast overhaul
+
+Completed all tasks from `ANTIGRAVITY-TASK-3.md`:
+
+1. **Verifiable Shipping Gate (Task 1):** Created `scripts/verify-shipped.sh` (`npm run verify:shipped`) enforcing git push parity, remote migration state, Vercel production build bundle match, and active Edge Function verification.
+2. **Synthetic Demo Carrier Identifiers (Task 2):** Audited all 7 demo carrier MC/USDOT numbers on FMCSA SAFER (recorded assigned carrier collisions in `PRODUCTION_PROGRESS.md`); replaced all 7 with synthetic `DEMO-` identifiers (`DEMO-MC-*` / `DEMO-DOT-*`) and updated `saferUrl` in `src/lib/carrier.ts` to suppress SAFER links for demo profiles.
+3. **Database Notification Triggers (Task 3):** Created `supabase/migrations/0008_notification_triggers.sql` defining Postgres triggers on `bids` and `deals` inserts wrapped in exception handlers so email logging never interrupts transactions.
+4. **WCAG AA Text Contrast Compliance (Task 4):** Elevated muted text opacities from `.34/.42/.45` to `0.65` in `src/index.css` and components; built `scripts/contrast-audit.mjs` with alpha compositing to verify 0 contrast failures.
+5. **Edge Function Alignment (Task 5):** Verified restored `supabase/functions/news/index.ts` deployment state.
+6. **RLS Harness & Action Items (Tasks 6 & 7):** Documented test project credentials and platform action items for Pratik.
+
 ### 1 Sep 2026 — Work Order 2 gap close-out
 
 Completed all nine close-out tasks from `ANTIGRAVITY-TASK-2.md`:

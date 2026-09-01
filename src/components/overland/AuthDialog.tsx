@@ -182,7 +182,7 @@ export default function AuthDialog() {
           onClick={closeAuth}
           aria-label="Close"
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgba(17,17,17,.06)]"
-          style={{ color: 'rgba(17,17,17,.45)', fontSize: 20, lineHeight: 1 }}
+          style={{ color: 'rgba(17,17,17,.65)', fontSize: 20, lineHeight: 1 }}
         >
           ×
         </button>
@@ -251,7 +251,7 @@ export default function AuthDialog() {
                   type="button"
                   onClick={() => { setEmailOpen(true); setReturning(false); }}
                   className="w-full py-2 text-center text-[13px] underline underline-offset-4"
-                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}
+                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}
                 >
                   Sign up with email instead
                 </button>
@@ -259,7 +259,7 @@ export default function AuthDialog() {
                   type="button"
                   onClick={() => { setEmailOpen(true); setReturning(true); setMethod('password'); }}
                   className="w-full py-1 text-center text-[13px]"
-                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)' }}
+                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}
                 >
                   Already have an account?{' '}
                   <span className="underline underline-offset-4" style={{ color: ACCENT }}>Sign in</span>
@@ -270,7 +270,7 @@ export default function AuthDialog() {
             {emailOpen && (
               <div className="my-5 flex items-center gap-3">
                 <span className="h-px flex-1" style={{ background: 'rgba(17,17,17,.10)' }} />
-                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>{returning ? 'sign in' : 'create your account'}</span>
+                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>{returning ? 'sign in' : 'create your account'}</span>
                 <span className="h-px flex-1" style={{ background: 'rgba(17,17,17,.10)' }} />
               </div>
             )}
@@ -381,7 +381,7 @@ export default function AuthDialog() {
                     <button type="button" onClick={() => setShowPw((v) => !v)}
                             aria-label={showPw ? 'Hide password' : 'Show password'}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px]"
-                            style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.45)' }}>
+                            style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                       {showPw ? 'Hide' : 'Show'}
                     </button>
                   </div>
@@ -397,7 +397,7 @@ export default function AuthDialog() {
                                   style={{ background: i <= st.score ? bar : 'rgba(17,17,17,.10)' }} />
                           ))}
                         </div>
-                        <p className="mt-1.5 text-[11.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)' }}>
+                        <p className="mt-1.5 text-[11.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                           <span style={{ color: bar }}>{st.label}</span>
                           {st.hint ? ` — ${st.hint}` : ''}
                         </p>
@@ -406,7 +406,7 @@ export default function AuthDialog() {
                   })()}
 
                   {justGenerated && (
-                    <p className="mt-1.5 text-[11.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)' }}>
+                    <p className="mt-1.5 text-[11.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                       Generated in your browser. Let your password manager save it when it
                       offers — you will not need to remember it.
                     </p>
@@ -469,11 +469,11 @@ export default function AuthDialog() {
 
                 {!returning && (
                   <>
-                    <span aria-hidden style={{ color: 'rgba(17,17,17,.25)' }}>·</span>
+                    <span aria-hidden style={{ color: 'rgba(17,17,17,.65)' }}>·</span>
                     <button type="button"
                             onClick={() => { setMethod((m) => (m === 'password' ? 'link' : 'password')); setError(null); }}
                             className="text-[12px] underline underline-offset-2"
-                            style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)' }}>
+                            style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                       {method === 'password' ? 'Email me a link instead' : 'Use a password instead'}
                     </button>
                   </>
@@ -485,7 +485,7 @@ export default function AuthDialog() {
             {mode === 'supabase' && !googleOff && (
               <div className="my-5 flex items-center gap-3">
                 <span className="h-px flex-1" style={{ background: 'rgba(17,17,17,.10)' }} />
-                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>or</span>
+                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>or</span>
                 <span className="h-px flex-1" style={{ background: 'rgba(17,17,17,.10)' }} />
               </div>
             )}

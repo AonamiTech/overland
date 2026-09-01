@@ -78,13 +78,13 @@ function RateBreakdown({ lane, best }: { lane: Lane; best: number | null }) {
   const Row = ({ label, value, sub, strong = false, color }:
     { label: string; value: string; sub?: string; strong?: boolean; color?: string }) => (
     <div className="flex items-baseline justify-between gap-3 py-1.5">
-      <span className="text-[12.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}>
+      <span className="text-[12.5px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
         {label}
       </span>
       <span className="text-right">
         <span className="aon-num" style={{ fontSize: strong ? 16 : 13.5, color: color ?? INK }}>{value}</span>
         {sub && (
-          <span className="aon-num ml-2" style={{ fontSize: 11, color: 'rgba(17,17,17,.38)' }}>{sub}</span>
+          <span className="aon-num ml-2" style={{ fontSize: 11, color: 'rgba(17,17,17,.65)' }}>{sub}</span>
         )}
       </span>
     </div>
@@ -132,7 +132,7 @@ function RateBreakdown({ lane, best }: { lane: Lane; best: number | null }) {
         </div>
       </div>
 
-      <p className="mt-3 text-[11.5px] leading-[1.65]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.42)' }}>
+      <p className="mt-3 text-[11.5px] leading-[1.65]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
         Linehaul only. Fuel surcharge, detention, tarps, lumper and tolls are between you
         and the carrier. Practical miles price the load; the map figure is a straight-line
         road estimate, so the two differ. This is what the lane has been paying — not a
@@ -260,7 +260,7 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
               <div className="text-right">
                 <span className="aon-eyebrow">Board rate</span>
                 <div className="aon-num text-[22px]" style={{ color: INK }}>{money(lane.linehaul)}</div>
-                <div className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>{rpmFmt(lane.rpm)}/mi</div>
+                <div className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>{rpmFmt(lane.rpm)}/mi</div>
               </div>
               <button type="button" onClick={() => setReporting({ type: 'listing', id: lane.id })} className="aon-cta aon-cta--ghost">Report load</button>
               <button type="button" onClick={onClose} className="aon-cta aon-cta--ghost">Close</button>
@@ -310,10 +310,10 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                     </div>
                     <div className="flex items-baseline justify-between">
                       <dt className="aon-eyebrow">MC / USDOT</dt>
-                      <dd className="aon-num text-[14px]" style={{ color: 'rgba(17,17,17,.42)' }}>self-declared</dd>
+                      <dd className="aon-num text-[14px]" style={{ color: 'rgba(17,17,17,.65)' }}>self-declared</dd>
                     </div>
                   </dl>
-                  <p className="mt-5 text-[13px] leading-[1.7]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}>
+                  <p className="mt-5 text-[13px] leading-[1.7]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                     Rate confirmation, insurance and payment are between the two of you.
                     Check each other on the FMCSA register before anything moves. You verify
                     emails, not businesses.
@@ -345,9 +345,9 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                           {!mine && (
                             <Bidder name={o.from} onOpen={() => { const pid = profileIdFor(o.from); if (pid) setViewing(pid); }} onReport={() => setReporting({ type: 'bid', id: o.id })} />
                           )}
-                          {o.note && <p className="mt-1 text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}>{o.note}</p>}
+                          {o.note && <p className="mt-1 text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>{o.note}</p>}
                           <div className="mt-1 flex items-center justify-between">
-                            <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.34)' }}>{ago(o.at)}</span>
+                            <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>{ago(o.at)}</span>
                             {/* Accepting is what unlocks contact details, so it cannot be
                                 reachable without an account - otherwise the one thing we
                                 hold back is handed to anyone who opens the page. */}
@@ -388,7 +388,7 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                     <button type="submit" className="aon-cta aon-cta--dark mt-3 w-full justify-center">
                       Send counter{user ? '' : ' (sign in first)'}
                     </button>
-                    <p className="mt-3 text-[12px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.42)' }}>
+                    <p className="mt-3 text-[12px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                       Counters stay on the board. Nobody sees your contact details until
                       one of you accepts.
                     </p>

@@ -71,7 +71,7 @@ export default function ProfilePanel({ id, onClose }: { id: string; onClose: () 
               <p className="aon-body mt-1 text-[13px]">{p.city} · on the board {s.monthsOn} months</p>
             </div>
             <button type="button" onClick={onClose} aria-label="Close"
-                    className="shrink-0 text-[20px] leading-none" style={{ color: 'rgba(17,17,17,.4)' }}>×</button>
+                    className="shrink-0 text-[20px] leading-none" style={{ color: 'rgba(17,17,17,.65)' }}>×</button>
           </div>
 
           {/* the three numbers that matter */}
@@ -82,7 +82,7 @@ export default function ProfilePanel({ id, onClose }: { id: string; onClose: () 
                 <span className="aon-num text-[20px]" style={{ color: INK }}>{s.count ? s.avg : '—'}</span>
                 {!!s.count && <Stars value={s.avg} />}
               </dd>
-              <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>
+              <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>
                 {s.count} review{s.count === 1 ? '' : 's'}
               </span>
             </div>
@@ -96,7 +96,7 @@ export default function ProfilePanel({ id, onClose }: { id: string; onClose: () 
                 {s.completion !== null ? `${s.completion}%` : '—'}
               </dd>
               {s.completion === null && (
-                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>too few deals</span>
+                <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>too few deals</span>
               )}
             </div>
           </dl>
@@ -138,7 +138,7 @@ export default function ProfilePanel({ id, onClose }: { id: string; onClose: () 
                         <Stars value={r.stars} size={13} />
                       </div>
                       {r.note && <p className="aon-body mt-1.5 text-[13px] leading-[1.6]">{r.note}</p>}
-                      <span className="aon-eyebrow mt-1 block" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>{ago(r.at)}</span>
+                      <span className="aon-eyebrow mt-1 block" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>{ago(r.at)}</span>
                     </li>
                   ))}
                 </ul>
@@ -150,7 +150,7 @@ export default function ProfilePanel({ id, onClose }: { id: string; onClose: () 
                     <li key={d.id} className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <div className="truncate text-[14px]" style={{ fontFamily: 'Poppins, sans-serif', color: INK }}>{d.lane}</div>
-                        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>{ago(d.at)}</span>
+                        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>{ago(d.at)}</span>
                       </div>
                       <span className="aon-eyebrow shrink-0" style={{ color: d.status === 'confirmed' ? '#0F7A4A' : d.status === 'fell-through' ? '#DC2626' : 'rgba(17,17,17,.4)' }}>
                         {d.status === 'confirmed' ? 'Completed' : d.status === 'fell-through' ? 'Fell through' : 'Awaiting'}

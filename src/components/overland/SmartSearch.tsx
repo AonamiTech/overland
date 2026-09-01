@@ -101,7 +101,7 @@ export default function SmartSearch({
 
       {ai && parsed && parsed.understood.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.42)' }}>reading this as</span>
+          <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>reading this as</span>
           {parsed.understood.map((u) => (
             <span key={u} className="aon-eyebrow rounded-full px-2.5 py-1"
                   style={{ fontSize: 9, background: 'rgba(30,77,107,.08)', color: ACCENT }}>

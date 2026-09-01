@@ -80,7 +80,7 @@ export default function MarketNews() {
                     </span>
                     <span className="flex shrink-0 items-baseline gap-3">
                       <span className="aon-eyebrow" style={{ color: ACCENT, fontSize: 9 }}>{it.source}</span>
-                      <span className="aon-num text-[11px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+                      <span className="aon-num text-[11px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                         {when(it.published)}
                       </span>
                     </span>

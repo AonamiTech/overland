@@ -41,7 +41,7 @@ const onBoard = (t: number) => {
 /** Shown once beneath a list of offers, not on every card - it is the same sentence. */
 export function BidderDisclaimer() {
   return (
-    <p className="mt-3 text-[11px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.38)' }}>
+    <p className="mt-3 text-[11px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
       Names, MC/USDOT numbers and websites are self-declared — Overland verifies an email
       address and nothing more. SAFER is the FMCSA&rsquo;s own register: check anyone there
       before you move freight.
@@ -92,20 +92,20 @@ export default function BidderCard({ info, onOpenProfile, onReport }: { info: Bi
       {info.rating && info.rating.count > 0 && (
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <Stars value={info.rating.avg} size={12} />
-          <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.42)' }}>
+          <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>
             {info.rating.count} review{info.rating.count === 1 ? '' : 's'} · {info.rating.confirmed} completed
             {info.rating.completion !== null && ` · ${info.rating.completion}% went through`}
           </span>
         </div>
       )}
       {(!info.rating || info.rating.count === 0) && (
-        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>
+        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>
           No completed deals on Overland yet
         </span>
       )}
 
       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]"
-           style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)' }}>
+           style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
         {facts.map((f, i) => (
           <React.Fragment key={f}>
             {i > 0 && <span aria-hidden>·</span>}
@@ -142,14 +142,14 @@ export default function BidderCard({ info, onOpenProfile, onReport }: { info: Bi
         {onOpenProfile && (
           <button type="button" onClick={onOpenProfile}
                   className="rounded-[6px] px-2 py-[3px] text-[10.5px]"
-                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.5)', border: `1px solid ${HAIR}` }}>
+                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)', border: `1px solid ${HAIR}` }}>
             Profile
           </button>
         )}
         {onReport && (
           <button type="button" onClick={onReport}
                   className="rounded-[6px] px-2 py-[3px] text-[10.5px]"
-                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.4)', border: `1px solid ${HAIR}` }}>
+                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)', border: `1px solid ${HAIR}` }}>
             Report
           </button>
         )}

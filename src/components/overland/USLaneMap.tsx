@@ -34,9 +34,9 @@ export default function USLaneMap({
           </>
         )}
       </svg>
-      <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+      <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
         {CITIES[from]?.name} → {CITIES[to]?.name} · {miles.toLocaleString()} mi
-        <span style={{ color: 'rgba(17,17,17,.34)' }}> · road estimate</span>
+        <span style={{ color: 'rgba(17,17,17,.65)' }}> · road estimate</span>
       </p>
     </div>
   );

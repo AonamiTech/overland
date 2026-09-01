@@ -61,7 +61,7 @@ export default function HeroDirect() {
                   trades. Badging them "live" told a first-time visitor they were
                   looking at real market data - the single most misleading thing on
                   the page, and on the first screen. */}
-              <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>Indicative</span>
+              <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>Indicative</span>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="aon-num text-[38px]" style={{ color: INK }}>{rpmFmt(idx.now)}</span>

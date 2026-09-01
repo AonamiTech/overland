@@ -158,7 +158,7 @@ export default function BoardPage() {
             <span className="aon-eyebrow inline-flex items-center gap-2">
               <span className="ov-livedot" /> Market open
             </span>
-            <span className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+            <span className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
               {clock.toLocaleTimeString('en-US', { hour12: false })} ET
             </span>
             <button
@@ -228,7 +228,7 @@ export default function BoardPage() {
             above the table before you had seen a single lane. */}
         <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>
+            <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>
               Reference rates · simulated
             </span>
             <h2 className="aon-display mt-2 text-[clamp(24px,3vw,34px)]">Lane index</h2>
@@ -290,7 +290,7 @@ export default function BoardPage() {
             </button>
           )}
 
-          <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+          <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
             {rows.length} of {lanes.length} lanes
           </span>
         </div>
@@ -327,12 +327,12 @@ export default function BoardPage() {
             <thead>
               <tr>
                 <Th k="lane" align="left">Lane</Th>
-                <th className="px-4 py-3 text-left"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.42)' }}>Equip</span></th>
-                <th className="px-4 py-3 text-right"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.42)' }}>Miles</span></th>
+                <th className="px-4 py-3 text-left"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>Equip</span></th>
+                <th className="px-4 py-3 text-right"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>Miles</span></th>
                 <Th k="rpm">Last $/mi</Th>
                 <Th k="avgRpm">30d avg</Th>
                 <Th k="spread">vs avg</Th>
-                <th className="px-4 py-3 text-center"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.42)' }}>30d</span></th>
+                <th className="px-4 py-3 text-center"><span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>30d</span></th>
                 <Th k="linehaul">Linehaul</Th>
                 <Th k="bids">Bids</Th>
               </tr>
@@ -348,24 +348,24 @@ export default function BoardPage() {
                       onKeyDown={(e) => { if (e.key === 'Enter') setOpen(l); }}>
                     <td className="px-4 py-4">
                       <div className="flex items-baseline gap-2">
-                        <span className="aon-num text-[13px]" style={{ color: 'rgba(17,17,17,.34)' }}>{l.originCode}</span>
+                        <span className="aon-num text-[13px]" style={{ color: 'rgba(17,17,17,.65)' }}>{l.originCode}</span>
                         <span style={{ color: '#C9C3B8' }}>→</span>
-                        <span className="aon-num text-[13px]" style={{ color: 'rgba(17,17,17,.34)' }}>{l.destCode}</span>
+                        <span className="aon-num text-[13px]" style={{ color: 'rgba(17,17,17,.65)' }}>{l.destCode}</span>
                       </div>
                       <div className="mt-1 text-[14px]" style={{ fontFamily: 'Poppins, sans-serif', color: INK }}>
                         {l.origin} → {l.dest}
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.55)' }}>{l.equipment}</span>
+                      <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>{l.equipment}</span>
                     </td>
-                    <td className="aon-num px-4 py-4 text-right text-[13px]" style={{ color: 'rgba(17,17,17,.55)' }}>
+                    <td className="aon-num px-4 py-4 text-right text-[13px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                       {l.miles.toLocaleString()}
                     </td>
                     <td className="aon-num px-4 py-4 text-right text-[17px]" style={{ color: up ? UP : DOWN }}>
                       {rpmFmt(l.rpm)}
                     </td>
-                    <td className="aon-num px-4 py-4 text-right text-[15px]" style={{ color: 'rgba(17,17,17,.55)' }}>
+                    <td className="aon-num px-4 py-4 text-right text-[15px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                       {rpmFmt(l.avgRpm)}
                     </td>
                     <td className="aon-num px-4 py-4 text-right text-[14px]" style={{ color: spread >= 0 ? UP : DOWN }}>
@@ -386,8 +386,8 @@ export default function BoardPage() {
                       {money(l.linehaul)}
                     </td>
                     <td className="px-4 py-4 text-right">
-                      <span className="aon-num text-[14px]" style={{ color: 'rgba(17,17,17,.55)' }}>{l.bids}</span>
-                      <div className="aon-eyebrow mt-0.5" style={{ color: 'rgba(17,17,17,.34)' }}>{l.loads} open</div>
+                      <span className="aon-num text-[14px]" style={{ color: 'rgba(17,17,17,.65)' }}>{l.bids}</span>
+                      <div className="aon-eyebrow mt-0.5" style={{ color: 'rgba(17,17,17,.65)' }}>{l.loads} open</div>
                     </td>
                   </tr>
                 );
@@ -408,7 +408,7 @@ export default function BoardPage() {
         {open && <LaneDetail lane={open} onClose={() => setOpen(null)} />}
         {posting && <PostListing onClose={() => setPosting(false)} />}
 
-        <p className="aon-num mt-6 text-[11px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+        <p className="aon-num mt-6 text-[11px]" style={{ color: 'rgba(17,17,17,.65)' }}>
           Demo data. Rates are simulated from miles and equipment, not live market feeds.
         </p>
       </main>

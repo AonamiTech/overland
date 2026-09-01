@@ -87,7 +87,7 @@ export default function LiveListings() {
             Mine
           </button>
         )}
-        <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+        <span className="aon-num ml-auto text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
           {shown.length} listing{shown.length === 1 ? '' : 's'}
         </span>
       </div>
@@ -129,14 +129,14 @@ export default function LiveListings() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="aon-eyebrow" style={{ fontSize: 9, color: r.kind === 'load' ? ACCENT : 'rgba(17,17,17,.45)' }}>
+                      <span className="aon-eyebrow" style={{ fontSize: 9, color: r.kind === 'load' ? ACCENT : 'rgba(17,17,17,.65)' }}>
                         {r.kind === 'load' ? 'Freight' : 'Truck'}
                       </span>
                       <span className="aon-eyebrow" style={{ fontSize: 9 }}>{r.equipment}</span>
                       {mine && <span className="aon-eyebrow" style={{ fontSize: 9, color: ACCENT }}>Yours</span>}
                     </div>
                     <h3 className="aon-display mt-1.5 text-[19px]">{r.origin} → {r.dest}</h3>
-                    <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+                    <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                       {r.miles.toLocaleString()} mi
                       {r.ready_date ? ` · ready ${r.ready_date}` : ''}
                       {r.target_rate ? ` · asking ${money(r.target_rate)}` : ' · open to bids'}
@@ -146,7 +146,7 @@ export default function LiveListings() {
 
                   <div className="text-right">
                     <span className="aon-eyebrow" style={{ fontSize: 9 }}>Best bid</span>
-                    <div className="aon-num text-[20px]" style={{ color: r.best ? ACCENT : 'rgba(17,17,17,.34)' }}>
+                    <div className="aon-num text-[20px]" style={{ color: r.best ? ACCENT : 'rgba(17,17,17,.65)' }}>
                       {r.best ? money(r.best) : '—'}
                     </div>
                     {r.bids.length > 0 ? (
@@ -160,7 +160,7 @@ export default function LiveListings() {
                         {r.bids.length} bid{r.bids.length === 1 ? '' : 's'} {openBids === r.id ? '\u2191' : '\u2193'}
                       </button>
                     ) : (
-                      <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>no bids yet</span>
+                      <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>no bids yet</span>
                     )}
                     {!mine && (
                       <button type="button" onClick={() => setBidding(r)} className="aon-cta aon-cta--dark mt-3 w-full justify-center">
@@ -215,7 +215,7 @@ function OffersList({ row }: { row: Row }) {
     <div className="mt-4 border-t pt-4" style={{ borderColor: HAIR }}>
       <div className="flex items-baseline justify-between">
         <span className="aon-eyebrow">Offers on this {row.kind === 'load' ? 'load' : 'truck'}</span>
-        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.34)' }}>
+        <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>
           lowest first
         </span>
       </div>
@@ -235,7 +235,7 @@ function OffersList({ row }: { row: Row }) {
                 <span className="text-right">
                   <span className="aon-num text-[15px]">{money(b.amount)}</span>
                   {rpm > 0 && (
-                    <span className="aon-num ml-2" style={{ fontSize: 11, color: 'rgba(17,17,17,.4)' }}>
+                    <span className="aon-num ml-2" style={{ fontSize: 11, color: 'rgba(17,17,17,.65)' }}>
                       ${rpm.toFixed(2)}/mi
                     </span>
                   )}
@@ -249,7 +249,7 @@ function OffersList({ row }: { row: Row }) {
               )}
 
               {b.note && (
-                <p className="mt-1 text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}>
+                <p className="mt-1 text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
                   {b.note}
                 </p>
               )}
@@ -318,7 +318,7 @@ function BidSheet({ row, onClose, onDone }: { row: Row; onClose: () => void; onD
            onClick={(e) => e.stopPropagation()}>
         <span className="aon-eyebrow" style={{ color: ACCENT }}>Place a bid</span>
         <h2 className="aon-display mt-2 text-[22px]">{row.origin} → {row.dest}</h2>
-        <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+        <p className="aon-num mt-1 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
           {row.miles.toLocaleString()} mi · {row.equipment}
           {row.best ? ` · best so far ${money(row.best)}` : ''}
         </p>
@@ -330,7 +330,7 @@ function BidSheet({ row, onClose, onDone }: { row: Row; onClose: () => void; onD
                  className="aon-num mt-2 w-full rounded-[9px] px-4 py-3 text-[17px] outline-none"
                  style={{ background: 'rgba(17,17,17,.04)', border: `1px solid ${HAIR}` }} />
           {rpm > 0 && (
-            <p className="aon-num mt-1.5 text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+            <p className="aon-num mt-1.5 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
               ${rpm.toFixed(2)} per mile
             </p>
           )}

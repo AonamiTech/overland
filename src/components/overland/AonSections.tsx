@@ -419,7 +419,7 @@ export function IntegrationsSection() {
         <p className="aon-body mt-3 text-[14px]">Works with the systems you already run.</p>
         <ul className="mt-12 grid grid-cols-2 gap-y-8 sm:grid-cols-4">
           {SYSTEMS.map((s) => (
-            <li key={s} className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.32)' }}>
+            <li key={s} className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>
               {s}
             </li>
           ))}

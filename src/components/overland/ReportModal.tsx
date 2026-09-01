@@ -70,7 +70,7 @@ export default function ReportModal({
           onClick={onClose}
           aria-label="Close"
           className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full hover:bg-[rgba(17,17,17,.06)]"
-          style={{ color: 'rgba(17,17,17,.45)', fontSize: 18 }}
+          style={{ color: 'rgba(17,17,17,.65)', fontSize: 18 }}
         >
           ×
         </button>
@@ -108,7 +108,7 @@ export default function ReportModal({
                 className="mt-2 w-full rounded-[9px] p-3 text-[13.5px] outline-none"
                 style={{ fontFamily: 'Poppins, sans-serif', background: '#FAF9F7', border: `1px solid ${HAIR}` }}
               />
-              <span className="aon-num text-right text-[11px] block mt-1" style={{ color: 'rgba(17,17,17,.38)' }}>
+              <span className="aon-num text-right text-[11px] block mt-1" style={{ color: 'rgba(17,17,17,.65)' }}>
                 {reason.length}/500
               </span>
             </div>

@@ -15,12 +15,12 @@ export default function ErrorBoundaryFallback({ error, eventId, resetError }: Fa
       <div className="aon-card w-full max-w-[500px] p-8 text-center" style={{ border: '1px solid rgba(17,17,17,.10)' }}>
         <span className="aon-eyebrow" style={{ color: '#1E4D6B' }}>Error</span>
         <h1 className="aon-display mt-3 text-[26px]">Something went wrong on our side.</h1>
-        <p className="aon-body mt-3 text-[14px] leading-[1.65]" style={{ color: 'rgba(17,17,17,.60)' }}>
+        <p className="aon-body mt-3 text-[14px] leading-[1.65]" style={{ color: 'rgba(17,17,17,.65)' }}>
           {message}
         </p>
 
         {eventId && (
-          <p className="aon-num mt-4 rounded-[6px] bg-[rgba(17,17,17,.04)] px-3 py-1.5 text-[12px]" style={{ color: 'rgba(17,17,17,.45)' }}>
+          <p className="aon-num mt-4 rounded-[6px] bg-[rgba(17,17,17,.04)] px-3 py-1.5 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
             Event ID: {eventId}
           </p>
         )}

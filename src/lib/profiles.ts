@@ -64,26 +64,26 @@ const DAY = 864e5;
 /** Demo counterparties, so a bid has a profile worth opening on day one. */
 const SEED: Profile[] = [
   {
-    id: 'rio-grande', name: 'Rio Grande Carriers', role: 'carrier', accountType: 'company',
-    orgName: 'Rio Grande Carriers', city: 'Laredo, TX', mcNumber: '412885', usdotNumber: '1885402',
+    id: 'rio-grande', name: 'Rio Grande Carriers (Demo)', role: 'carrier', accountType: 'company',
+    orgName: 'Rio Grande Carriers (Demo)', city: 'Laredo, TX', mcNumber: 'DEMO-MC-412885', usdotNumber: 'DEMO-DOT-1885402',
     email: 'dispatch@riograndecarriers.com', website: 'riograndecarriers.com', phone: '9565550118',
     joinedAt: Date.now() - 420 * DAY, deals: [], ratings: [],
   },
   {
-    id: 'keystone', name: 'Keystone Logistics', role: 'carrier', accountType: 'company',
-    orgName: 'Keystone Logistics', city: 'Harrisburg, PA', mcNumber: '778110', usdotNumber: '2331097',
+    id: 'keystone', name: 'Keystone Logistics (Demo)', role: 'carrier', accountType: 'company',
+    orgName: 'Keystone Logistics (Demo)', city: 'Harrisburg, PA', mcNumber: 'DEMO-MC-778110', usdotNumber: 'DEMO-DOT-2331097',
     email: 'ops@keystonelog.com', website: 'keystonelog.com', phone: '7175550143',
     joinedAt: Date.now() - 260 * DAY, deals: [], ratings: [],
   },
   {
-    id: 'summit', name: 'Summit Freight', role: 'carrier', accountType: 'company',
-    orgName: 'Summit Freight', city: 'Denver, CO', mcNumber: '904221',
+    id: 'summit', name: 'Summit Freight (Demo)', role: 'carrier', accountType: 'company',
+    orgName: 'Summit Freight (Demo)', city: 'Denver, CO', mcNumber: 'DEMO-MC-904221',
     email: 'book@summitfreight.co', website: 'summitfreight.co', phone: '3035550177',
     joinedAt: Date.now() - 95 * DAY, deals: [], ratings: [],
   },
   {
-    id: 'dave-thompson', name: 'Dave Thompson', role: 'carrier', accountType: 'individual',
-    city: 'Memphis, TN', mcNumber: '1188402', usdotNumber: '3902118',
+    id: 'dave-thompson', name: 'Dave Thompson (Demo)', role: 'carrier', accountType: 'individual',
+    city: 'Memphis, TN', mcNumber: 'DEMO-MC-1188402', usdotNumber: 'DEMO-DOT-3902118',
     email: 'dave@thompsontrucking.com', website: 'thompsontrucking.com', phone: '9015550164',
     joinedAt: Date.now() - 180 * DAY, deals: [], ratings: [],
   },

@@ -23,13 +23,19 @@ export type CarrierLink = {
 const enc = encodeURIComponent;
 
 /** FMCSA carrier snapshot. USDOT is the better key - MC numbers get reassigned. */
-export function saferUrl(opts: { usdot?: string; mc?: string }): string | null {
-  const dot = opts.usdot?.replace(/\D/g, '');
+export function saferUrl(opts: { usdot?: string; mc?: string; isDemo?: boolean }): string | null {
+  if (opts.isDemo) return null;
+  const dotRaw = opts.usdot?.trim();
+  if (dotRaw?.toUpperCase().startsWith('DEMO')) return null;
+  const mcRaw = opts.mc?.trim();
+  if (mcRaw?.toUpperCase().startsWith('DEMO')) return null;
+
+  const dot = dotRaw?.replace(/\D/g, '');
   if (dot) {
     return 'https://safer.fmcsa.dot.gov/query.asp?searchtype=ANY&query_type=queryCarrierSnapshot'
       + `&query_param=USDOT&query_string=${enc(dot)}`;
   }
-  const mc = opts.mc?.replace(/\D/g, '');
+  const mc = mcRaw?.replace(/\D/g, '');
   if (mc) {
     return 'https://safer.fmcsa.dot.gov/query.asp?searchtype=ANY&query_type=queryCarrierSnapshot'
       + `&query_param=MC_MX&query_string=${enc(mc)}`;

@@ -134,4 +134,22 @@ describe('BidderCard', () => {
     expect(saferLinkMcOnly.getAttribute('href')).toContain('query_param=MC_MX');
     expect(saferLinkMcOnly.getAttribute('href')).toContain('query_string=1188402');
   });
+
+  it('suppresses SAFER link generation for synthetic DEMO- identifiers', () => {
+    vi.spyOn(AuthContextModule, 'useAuth').mockReturnValue({
+      user: { id: 'usr_1', email: 'u1@test.com', role: 'shipper', accountType: 'company', name: 'Test', phone: '555', city: 'Dallas', createdAt: new Date().toISOString() },
+      loading: false, mode: 'supabase', authError: null, openAuth: vi.fn(), closeAuth: vi.fn(), authOpen: false, pendingRole: 'shipper',
+      signUpWithPassword: vi.fn(), signInWithPassword: vi.fn(), sendLink: vi.fn(), updateProfile: vi.fn(), signInWithGoogle: vi.fn(), signOut: vi.fn()
+    });
+
+    const demoBidder: BidderInfo = {
+      name: 'Rio Grande Carriers (Demo)',
+      accountType: 'company',
+      mcNumber: 'DEMO-MC-412885',
+      usdotNumber: 'DEMO-DOT-1885402',
+    };
+
+    render(<BidderCard info={demoBidder} />);
+    expect(screen.queryByRole('link', { name: /FMCSA SAFER/i })).toBeNull();
+  });
 });

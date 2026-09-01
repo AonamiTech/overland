@@ -82,7 +82,7 @@ export default function CompleteProfile() {
           onClick={() => setSkipped(true)}
           aria-label="Close"
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgba(17,17,17,.06)]"
-          style={{ color: 'rgba(17,17,17,.45)', fontSize: 20, lineHeight: 1 }}
+          style={{ color: 'rgba(17,17,17,.65)', fontSize: 20, lineHeight: 1 }}
         >
           &times;
         </button>
@@ -188,7 +188,7 @@ export default function CompleteProfile() {
             fill it in later from the profile menu, and posting nags them then. */}
         <button type="button" onClick={() => setSkipped(true)}
                 className="mt-3 w-full text-center text-[12px]"
-                style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.42)' }}>
+                style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
           I'll do this later
         </button>
       </div>

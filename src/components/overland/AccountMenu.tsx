@@ -132,7 +132,7 @@ export default function AccountMenu() {
               <div className="truncate text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: INK }}>
                 {user.name || user.email}
               </div>
-              <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.42)' }}>
+              <span className="aon-eyebrow" style={{ fontSize: 9, color: 'rgba(17,17,17,.65)' }}>
                 {user.role === 'carrier' ? 'Carrier' : 'Shipper'} · {user.accountType === 'company' ? 'Company' : 'Individual'}
               </span>
             </div>

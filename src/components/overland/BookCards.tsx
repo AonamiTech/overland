@@ -72,10 +72,10 @@ export default function BookCards() {
           {cards.map(({ lane: l, poster, isCompany, ready }) => (
             <article key={l.id} className="aon-card aon-card flex flex-col p-6">
               <div className="flex items-center justify-between">
-                <span className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.34)' }}>
+                <span className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                   {l.originCode} → {l.destCode}
                 </span>
-                <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.42)' }}>{l.equipment}</span>
+                <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>{l.equipment}</span>
               </div>
 
               <h3 className="aon-display mt-3 text-[20px]">{l.origin} → {l.dest}</h3>
@@ -100,7 +100,7 @@ export default function BookCards() {
                   <div className="text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: INK }}>{poster}</div>
                   {/* Company vs individual is asked at sign-up and shown here - it changes
                       who you think you are dealing with. */}
-                  <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.34)', fontSize: 9 }}>
+                  <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)', fontSize: 9 }}>
                     {isCompany ? 'Company' : 'Individual'} · {l.bids} bids
                   </span>
                 </div>
@@ -114,7 +114,7 @@ export default function BookCards() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
           <button type="button" onClick={go} className="aon-cta aon-cta--dark">Open the board</button>
-          <p className="text-[12px] leading-[1.7]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.42)' }}>
+          <p className="text-[12px] leading-[1.7]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.65)' }}>
             Demo listings. Rates are indicative, not quotes — verify every counterparty yourself.
           </p>
         </div>

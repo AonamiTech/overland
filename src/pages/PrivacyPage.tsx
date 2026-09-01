@@ -17,13 +17,13 @@ export default function PrivacyPage() {
       <header className="border-b" style={{ borderColor: 'rgba(17,17,17,.10)' }}>
         <div className="mx-auto max-w-[760px] px-6 py-4 flex items-center justify-between">
           <Link to="/" className="aon-eyebrow" style={{ color: '#111111', letterSpacing: '.18em' }}>OVERLAND</Link>
-          <Link to="/terms" className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.55)' }}>Terms</Link>
+          <Link to="/terms" className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.65)' }}>Terms</Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-[760px] px-6 py-14">
         <h1 className="aon-display text-[clamp(30px,4.5vw,44px)]">Privacy Policy</h1>
-        <p className="aon-body mt-3 text-[15px] leading-[1.6]" style={{ color: 'rgba(17,17,17,.55)' }}>
+        <p className="aon-body mt-3 text-[15px] leading-[1.6]" style={{ color: 'rgba(17,17,17,.65)' }}>
           Last updated: September 2026. Overland is committed to straightforward, transparent handling of your data.
         </p>
 

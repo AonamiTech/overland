@@ -116,7 +116,7 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
              role="dialog" aria-modal="true" aria-labelledby="post-listing-title">
           <button type="button" onClick={onClose} aria-label="Close"
                   className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full hover:bg-[rgba(17,17,17,.06)]"
-                  style={{ color: 'rgba(17,17,17,.45)', fontSize: 20, lineHeight: 1 }}>×</button>
+                  style={{ color: 'rgba(17,17,17,.65)', fontSize: 20, lineHeight: 1 }}>×</button>
 
           {done ? (
             <>
@@ -175,7 +175,7 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
                 )}
 
                 {miles > 0 && (
-                  <p className="aon-num mt-2 text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>
+                  <p className="aon-num mt-2 text-[12px]" style={{ color: 'rgba(17,17,17,.65)' }}>
                     {miles.toLocaleString()} mi{rpm ? ` · ${'$' + rpm.toFixed(2)}/mi` : ''}
                   </p>
                 )}
