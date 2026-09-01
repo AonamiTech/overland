@@ -8,6 +8,7 @@ import PostListing from '@/components/overland/PostListing';
 import SmartSearch from '@/components/overland/SmartSearch';
 import type { ParsedQuery } from '@/lib/parseQuery';
 import LiveListings from '@/components/overland/LiveListings';
+import DieselStrip from '@/components/overland/DieselStrip';
 import { boardCounts, isLive } from '@/lib/db';
 import { events } from '@/lib/analytics';
 import {
@@ -215,11 +216,17 @@ export default function BoardPage() {
 
         <LiveListings />
 
+        {/* The real number goes immediately above the modelled ones. A carrier
+            reading $2.50/mi should see what fuel is costing in the same glance. */}
+        <div className="mt-14">
+          <DieselStrip />
+        </div>
+
         {/* ---- lane index header ------------------------------------------- */}
         {/* Heading left, the two things you came to do on the right. The filter
             panel this replaced put four dropdowns, a search field and a pill row
             above the table before you had seen a single lane. */}
-        <div className="mt-14 flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>
               Reference rates · simulated
