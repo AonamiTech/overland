@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, type Role, type AccountType } from '@/auth/AuthContext';
 import { US_STATES, CITIES_BY_STATE, DIAL_CODES, digitsOnly, isValidPhone, isValidZip } from '@/lib/geo';
 import { generatePassword, strength, MIN_PASSWORD } from '@/lib/password';
+import { scrollToEl } from '@/lib/scrollTo';
 import { events } from '@/lib/analytics';
 
 /**
@@ -82,7 +83,7 @@ export default function AuthDialog() {
     setError(msg);
     const el = document.getElementById(id);
     el?.focus();
-    el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    scrollToEl(el, { offset: 120 });
     return false;
   };
 

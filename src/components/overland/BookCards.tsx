@@ -39,7 +39,7 @@ export default function BookCards() {
       <div className="mx-auto max-w-[1126px] px-6">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <span className="aon-eyebrow"><span className="dot" /> The open marketplace · live</span>
+            <span className="aon-eyebrow"><span className="dot" /> The open marketplace</span>
             <h2 className="aon-display mt-4 text-[clamp(30px,4vw,50px)]">
               Get trucking <span style={{ color: ACCENT }}>now.</span>
             </h2>

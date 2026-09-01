@@ -57,7 +57,11 @@ export default function HeroDirect() {
           <div className="rounded-[9px] bg-white p-6" style={{ border: `1px solid ${HAIR}` }}>
             <div className="flex items-baseline justify-between">
               <span className="aon-eyebrow">National average</span>
-              <span className="aon-eyebrow" style={{ color: ACCENT }}>live</span>
+              {/* These rates are modelled from miles and equipment, not observed
+                  trades. Badging them "live" told a first-time visitor they were
+                  looking at real market data - the single most misleading thing on
+                  the page, and on the first screen. */}
+              <span className="aon-eyebrow" style={{ color: 'rgba(17,17,17,.45)' }}>Indicative</span>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="aon-num text-[38px]" style={{ color: INK }}>{rpmFmt(idx.now)}</span>
@@ -79,7 +83,11 @@ export default function HeroDirect() {
               ))}
             </ul>
 
-            <a href="#lanes" className="aon-eyebrow mt-4 inline-block" style={{ color: ACCENT }}>
+            <p className="aon-body mt-4 text-[11.5px] leading-[1.5]">
+              Modelled from miles and equipment, not live transactions — a sanity
+              check, not a quote.
+            </p>
+            <a href="#lanes" className="aon-eyebrow mt-3 inline-block" style={{ color: ACCENT }}>
               See every lane →
             </a>
           </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
+import { scrollToEl } from '@/lib/scrollTo';
 
 /**
  * Mobile bottom tab bar.
@@ -84,7 +85,7 @@ export default function MobileTabBar({ onPost }: { onPost?: () => void } = {}) {
     if (t.key === 'post') { if (!user) return openAuth('shipper'); if (onPost) return onPost(); return nav('/board'); }
     if (t.href.startsWith('/')) return nav(t.href);
     const el = document.querySelector(t.href);
-    el ? el.scrollIntoView({ behavior: 'smooth' }) : nav('/' + t.href);
+    el ? scrollToEl(el, { offset: 64 }) : nav('/' + t.href);
   };
 
   // No fallback: on a page that is none of these, nothing should look selected.

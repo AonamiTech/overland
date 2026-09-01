@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { scrollToEl } from '@/lib/scrollTo';
 import { Menu, X } from "lucide-react";
 import AuthModal from './AuthModal';
 import ContactModal from './ContactModal';
@@ -30,7 +31,7 @@ const Navigation = () => {
     // Smooth scroll to section
     const element = document.querySelector(link.anchor);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      scrollToEl(element, { offset: 72 });
     }
   };
 
