@@ -1,7 +1,7 @@
 # Audit brief — for Antigravity
 
 Repository: `~/Downloads/overland` · `github.com/pratikkp24/overland`
-Live: `https://overland-ochre.vercel.app`
+Live: `https://overland-5c4.pages.dev`
 Written: 1 Sep 2026
 
 This is a work order, not a report. Everything below was reproduced against

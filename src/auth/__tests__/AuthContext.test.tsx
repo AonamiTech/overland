@@ -268,7 +268,7 @@ describe('AuthContext', () => {
     );
 
     await waitFor(() => expect(screen.getByTestId('error')).toBeInTheDocument());
-    expect(screen.getByTestId('error').textContent).toContain('Google sign-in is temporarily unavailable');
+    expect(screen.getByTestId('error').textContent).toContain('Google sign-in could not complete');
     expect(localStorage.getItem('overland.google_broken')).toBeNull();
 
     // A later successful session does not need to clear a suppression flag.

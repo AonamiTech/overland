@@ -1,7 +1,7 @@
 # Antigravity work package — Overland auth layer
 
 **Repo:** `~/Downloads/overland`
-**Live:** https://overland-ochre.vercel.app · Vercel project `overland` (account `pratikkp24`)
+**Live:** https://overland-5c4.pages.dev · Cloudflare Pages project `overland`
 **Goal:** ship today.
 
 ## Context

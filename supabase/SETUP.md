@@ -137,21 +137,23 @@ in client code. Local-mode branches remain available for isolated tests.
 
 ## 6. Google sign-in and callback URLs
 
-Email/password and magic-link auth work without Google. To enable the optional Google
-button:
+Email/password and magic-link auth work without Google. For the Cloudflare production
+site, configure the Google button as follows:
 
 1. In Supabase Dashboard → **Authentication → Providers → Google**, enable Google and
-   copy the provider callback URL shown there.
+   copy the provider callback URL shown there. For this project it is
+   `https://ulywxnfrkmhaucvgxofc.supabase.co/auth/v1/callback`.
 2. In Google Cloud Console, add that exact Supabase callback URL as an **Authorized
-   redirect URI** for the OAuth web client. Add the deployed app origin and local app
-   origin as authorized JavaScript origins if Google requests them.
+   redirect URI** for the OAuth web client. Add
+   `https://overland-5c4.pages.dev` as an Authorized JavaScript origin.
 3. Copy the same OAuth client ID and client secret into the Supabase Google provider.
    A secret mismatch causes the return exchange to fail; it cannot be repaired from
    browser code.
-4. In Supabase **Authentication → URL Configuration**, allow the deployed app root and
-   `http://localhost:8080/` as redirect URLs. Overland adds a same-origin return-path
-   query parameter to that root callback so a visitor returns to the page that opened
-   sign-in.
+4. In Supabase **Authentication → URL Configuration**, set the Site URL to
+   `https://overland-5c4.pages.dev/` and allow these redirect URLs:
+   `https://overland-5c4.pages.dev/` and `https://overland-5c4.pages.dev/**`.
+   Overland adds a same-origin return-path query parameter to that root callback so a
+   visitor returns to the page that opened sign-in.
 
 The Google option remains visible even when a provider attempt fails. The app reports
 the provider error and keeps email/password and magic-link sign-in available while the

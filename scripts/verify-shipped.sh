@@ -34,7 +34,7 @@ fi
 # FRESH build. Checking that it merely exists in dist/ is not enough: a stale
 # dist/ from before the last code change satisfies that and the check passes
 # while the deployed site runs old code. That happened.
-LIVE=$(curl -s --max-time 30 https://overland-ochre.vercel.app/ \
+LIVE=$(curl -s --max-time 30 https://overland-5c4.pages.dev/ \
        | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1 | sed 's|assets/||')
 npm run build >/dev/null 2>&1 || bad "build failed"
 FRESH=$(node -e "const f=require('fs').readFileSync('dist/index.html','utf8');const m=f.match(/assets\/(index-[A-Za-z0-9_-]+\.js)/);console.log(m?m[1]:'')" 2>/dev/null)
@@ -42,7 +42,7 @@ if [ -z "$LIVE" ]; then bad "could not read the live site"
 elif [ -z "$FRESH" ]; then bad "could not determine the freshly built bundle"
 elif [ "$LIVE" != "$FRESH" ]; then
   bad "built but not deployed"
-  note "live serves $LIVE; a fresh build produces $FRESH — run vercel --prod"
+  note "live serves $LIVE; a fresh build produces $FRESH — deploy the current Cloudflare Pages commit"
 else ok "deployed ($LIVE)"; fi
 
 # 4 — every edge function in the repo is deployed

@@ -79,7 +79,7 @@ export function laneJsonLd(l: LaneSeo, url: string) {
         '@id': `${url}#service`,
         name: `${l.origin} to ${l.dest} freight`,
         serviceType: `${l.equipment} truckload`,
-        provider: { '@type': 'Organization', name: 'Overland', url: 'https://overland-ochre.vercel.app' },
+        provider: { '@type': 'Organization', name: 'Overland', url: 'https://overland-5c4.pages.dev' },
         areaServed: { '@type': 'Country', name: 'United States' },
         offers: {
           '@type': 'Offer',

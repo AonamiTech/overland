@@ -110,14 +110,14 @@ describe('AuthDialog', () => {
   it('turns a provider failure into an actionable error and keeps Google available', async () => {
     setupAuth({
       mode: 'supabase',
-      signInWithGoogle: vi.fn().mockResolvedValue({ ok: false, error: 'Google sign-in is not available yet. Use your email instead.' }),
+      signInWithGoogle: vi.fn().mockResolvedValue({ ok: false, error: 'Google sign-in is not configured correctly yet. Check the Google OAuth client ID, secret, and Supabase callback URL, then try again.' }),
     });
     renderDialog();
 
     const google = screen.getByRole('button', { name: 'Continue with Google' });
     fireEvent.click(google);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/Google sign-in is not available yet/i);
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Google sign-in is not configured correctly yet/i);
     expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeInTheDocument();
   });
 });

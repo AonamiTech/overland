@@ -240,7 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!cancelled) {
             setAuthError(
               providerBroken
-                ? 'Google sign-in is temporarily unavailable. Use your email and password — it takes a moment and works the same.'
+                ? 'Google sign-in could not complete. Check the Google OAuth client ID, secret, and Supabase callback URL, then try again.'
                 : plain,
             );
           }
@@ -523,7 +523,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return {
             ok: false,
             error: notConfigured
-              ? 'Google sign-in is not available yet. Use your email instead.'
+              ? 'Google sign-in is not configured correctly yet. Check the Google OAuth client ID, secret, and Supabase callback URL, then try again.'
               : error.message,
           };
         }

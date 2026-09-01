@@ -40,7 +40,7 @@ function textBetween(block: string, tag: string): string | null {
 async function readFeed(f: { source: string; url: string }): Promise<Item[]> {
   try {
     const res = await fetch(f.url, {
-      headers: { 'user-agent': 'OverlandBot/1.0 (+https://overland-ochre.vercel.app)' },
+      headers: { 'user-agent': 'OverlandBot/1.0 (+https://overland-5c4.pages.dev)' },
       signal: AbortSignal.timeout(6000),
     });
     if (!res.ok) return [];
