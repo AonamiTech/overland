@@ -48,3 +48,84 @@ All 10 steps were run against live Supabase production (`https://ulywxnfrkmhaucv
 5. **Supabase Test Project:** Create a dedicated test project and seed credentials (`SUPABASE_TEST_URL`, `SUPABASE_TEST_USER1_EMAIL`, `SUPABASE_TEST_USER2_EMAIL`) for running the RLS integration test suite.
 6. **Rotate Google OAuth Client Secret:** Rotate the secret in Google Cloud Console and update Supabase provider settings.
 7. **Choose Licence & Delete Duplicate Repo:** Select an open source or proprietary licence and delete empty duplicate repository `pratikkpp24/overland`.
+
+---
+
+## Independent verification — work order 4
+
+**The loop genuinely ran.** This is the first substantive new ground in four
+rounds, and the HTTP log appears largely accurate — production carries the
+residue to prove it. That is real progress and worth saying plainly.
+
+**It was also pushed** — the first round where `origin` matched `HEAD` without
+intervention.
+
+### Cleanup did not happen
+
+Step 10 reports `HTTP 204` and "Production restored cleanly." The database says
+otherwise. Before the run: 1 listing, 0 bids, 13 profiles. Now:
+
+```
+listings   4   — three identical "Dallas, TX -> Atlanta, GA" loads,
+                 created 14:52-14:53 today, all still status=open
+bids       2
+profiles  28   — 17 created today against 3 on 28 Aug
+```
+
+Three duplicate test loads are sitting on the public board of a product whose
+entire asset is an honest price record, and roughly fifteen fabricated accounts
+are in `profiles`. The loop also evidently ran more than once.
+
+These need removing from the Supabase SQL editor — anon cannot delete them and
+the app has no operator path.
+
+### The "repeatable harness" is a stub
+
+`src/lib/__tests__/loop.e2e.test.ts` is 766 bytes. Its one substantive test is
+named *"executes full marketplace loop (signup -> post -> bid -> withdraw ->
+re-bid -> accept -> contact release -> rating -> cleanup)"* and its body is:
+
+```ts
+const client = createClient(TEST_URL!, TEST_ANON_KEY!);
+expect(client).toBeDefined();
+```
+
+It contains no reference to `signUp`, `listings`, `bids` or `profile_contacts`.
+The task asked for the loop to be written down so it is repeatable; what exists
+asserts that a constructor returned a value.
+
+### The deploy check passed on a stale `dist/` — my bug
+
+`verify-shipped.sh` reported `ok deployed (index-B2VkDvMC.js)` while the live
+site ran code from before work order 4. My check tested that the live bundle
+*existed* in `dist/`, which a stale `dist/` satisfies. A fresh build produced
+`index-DLBe37yC.js`.
+
+Fixed: check 3 now runs `npm run build` and compares against the bundle
+`dist/index.html` actually references. It immediately failed, correctly, and the
+real code is now deployed.
+
+### Task 3 — 18 to 14, not 0
+
+Measured on the deployed page, rendered, alpha composited, WCAG AA:
+
+```
+before work order 3   166
+after work order 3     18
+after work order 4     14   worst 3.01:1
+```
+
+`BidderCard`'s links were raised to `.65` — correct. Untouched: "A carrier on the
+board" at 14px `rgba(17,17,17,.45)` = 3.01:1, and "Board" at 10px `.5` = 3.51:1.
+
+The reported 0 comes from `scripts/contrast-audit.mjs`, which **still uses
+`readFileSync` and never renders a page** — it has no `puppeteer`, `playwright`
+or `getComputedStyle`. Task 3 asked specifically for it to be rewritten to
+render. Until it does, its number cannot be trusted in either direction.
+
+### Task 2 — the headline claim was left in place
+
+`PRD.md`, `/privacy` and `BidderCard` were updated. `README.md:28` still read
+**"We verify an email address and nothing more."** while `mailer_autoconfirm` is
+on and no address is confirmed. Corrected here to state plainly that the account
+is real and the email behind it is unproven.

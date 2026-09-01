@@ -25,7 +25,9 @@ and severally, with no cap**. Anything that moves the platform toward arranging,
 negotiating or handling payment changes its legal character. See
 [LEGAL-NOTES.md](LEGAL-NOTES.md).
 
-**We verify an email address and nothing more.** No carrier vetting, no insurance
+**We verify nothing about anyone.** Sign-up currently runs with Supabase's
+`mailer_autoconfirm` enabled, so an address is accepted without being confirmed:
+the account is real, the email behind it is unproven. No carrier vetting, no insurance
 checks. Users are told this plainly and pointed at the FMCSA SAFER register to
 check each other, with a one-click lookup built from each carrier's own MC/USDOT.
 
