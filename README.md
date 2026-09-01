@@ -1,73 +1,157 @@
-# Welcome to your Lovable project
+# Overland
 
-## Project info
+An open freight board for US trucking. Shippers post loads, carriers post trucks,
+and either side bids on the other. Every bid is public.
 
-**URL**: https://lovable.dev/projects/deb49938-6850-4059-8ac8-f361ae5d4233
+**Live:** [overland-ochre.vercel.app](https://overland-ochre.vercel.app)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## What this is, and what it deliberately is not
 
-**Use Lovable**
+Overland is a **listing board, not a broker**. The platform never takes custody of
+freight, never handles money, and is not a party to any deal. It has no commission
+and no membership fee.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/deb49938-6850-4059-8ac8-f361ae5d4233) and start prompting.
+Contact details stay hidden until one side accepts a bid. At that moment both
+parties are introduced by email and the platform steps out — rate confirmation,
+insurance and payment are between them.
 
-Changes made via Lovable will be committed automatically to this repo.
+This boundary is not a stylistic choice. Under [49 CFR 371.2](https://www.law.cornell.edu/cfr/text/49/371.2)
+a broker is a person who, *for compensation*, arranges transportation, and
+[49 U.S.C. § 14916](https://www.law.cornell.edu/uscode/text/49/14916) attaches
+liability for unlicensed brokerage to officers and directors **personally, jointly
+and severally, with no cap**. Anything that moves the platform toward arranging,
+negotiating or handling payment changes its legal character. See
+[LEGAL-NOTES.md](LEGAL-NOTES.md).
 
-**Use your preferred IDE**
+**We verify an email address and nothing more.** No carrier vetting, no insurance
+checks. Users are told this plainly and pointed at the FMCSA SAFER register to
+check each other, with a one-click lookup built from each carrier's own MC/USDOT.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## The privacy promise is enforced by Postgres
 
-Follow these steps:
+Bids are public — that is the product. Contact details are not, and the boundary
+is a database policy rather than a hidden component.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+`profiles` holds the public record: name, role, city, self-declared MC/USDOT.
+Email and phone live in a **separate `profile_contacts` table** whose row-level
+security policy exposes a row only to its owner or to an accepted-deal
+counterparty. A client that asks for someone else's contacts gets nothing back,
+because the database refuses — not because the UI hid a `<div>`.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Never move `email` or `phone` into `profiles`, and never expose a view that joins
+them without the accepted-deal condition.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## Stack
+
+| | |
+|---|---|
+| Build | Vite 5 · React 18 · TypeScript 5.5 |
+| Styling | Tailwind 3.4 · shadcn/ui · a bespoke token layer ([DESIGN.md](DESIGN.md)) |
+| Routing | React Router 6 |
+| Backend | Supabase — Postgres, row-level security, auth, edge functions |
+| Charts | Recharts |
+| Tests | Vitest |
+| Hosting | Vercel |
+
+---
+
+## Running it
+
+```bash
+npm install
+npm run dev          # http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+With no environment variables the app runs in **local mode**: nothing is sent, no
+email leaves the browser, and sign-in completes immediately against
+`localStorage`. That is the fastest way to click through the product.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To run against a real backend, create `.env` from the example:
 
-**Use GitHub Codespaces**
+```bash
+cp .env.example .env
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+| Variable | Required | Notes |
+|---|---|---|
+| `VITE_SUPABASE_URL` | for live mode | Both must be set, or the app falls back to local mode |
+| `VITE_SUPABASE_ANON_KEY` | for live mode | Public by design and safe in the bundle. The `service_role` key must **never** appear in this repo or in client code |
+| `VITE_GOOGLE_AUTH` | no | Set to `off` to hide the Google button while its provider credentials are being fixed |
 
-## What technologies are used for this project?
+Then apply the migrations in `supabase/migrations/` in order. See
+[supabase/SETUP.md](supabase/SETUP.md).
 
-This project is built with:
+### Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+npm run typecheck    # tsc -b  — see the note below
+npm run test         # vitest
+npm run build        # tsc -b && vite build
+npm run lint
+```
 
-## How can I deploy this project?
+**Use `npm run typecheck`, not `tsc --noEmit`.** The root `tsconfig.json` has
+`"files": []`, so a bare `--noEmit` type-checks nothing and passes silently. Only
+`tsc -b` walks the project references.
 
-Simply open [Lovable](https://lovable.dev/projects/deb49938-6850-4059-8ac8-f361ae5d4233) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## Layout
 
-Yes, you can!
+```
+src/
+  auth/                  AuthContext, Supabase client, route guard
+  components/overland/   The current product — board, bidding, profiles, auth
+  lib/                   db · market · usmap · parseQuery · seo · carrier · password
+  pages/                 Index · BoardPage
+  test/                  Persona-driven tests
+supabase/
+  migrations/            0001_init · 0002_harden · 0003_website
+  functions/             news · ai-search (Deno)
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Two design layers coexist in `src/index.css`: `.aon-*` is current and owns the
+product surfaces, `.ov-*` is legacy and owns ~24 older routes. **Mixing them on
+one screen is the most common visual bug in this repo.** Read
+[DESIGN.md](DESIGN.md) before writing UI.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## Docs
+
+| File | What it covers |
+|---|---|
+| [PRD.md](PRD.md) | What the product is, who it serves, and what is in and out of scope |
+| [DESIGN.md](DESIGN.md) | The design system, the two layers, and the footguns that have actually bitten |
+| [LEGAL-NOTES.md](LEGAL-NOTES.md) | Broker-status boundary and what must never be built |
+| [supabase/SETUP.md](supabase/SETUP.md) | Database setup and migrations |
+| [supabase/EMAIL-TEMPLATES.md](supabase/EMAIL-TEMPLATES.md) | Auth email copy |
+| [HANDOVER.md](HANDOVER.md) | Current state and open threads |
+
+---
+
+## Known state
+
+- **Email sign-up and sign-in work end to end.** Verified against production.
+- **Google sign-in is not working.** The outbound leg reaches Google correctly;
+  the return fails with `Unable to exchange external code`, which means the Google
+  **Client Secret in the Supabase provider settings does not match** Google Cloud
+  Console. A failed return now disables the button on that device and clears
+  itself once a sign-in succeeds, so fixing the secret needs no redeploy.
+- `profiles` and `listings` are empty in production. Accounts exist in
+  `auth.users`, so either nothing writes a profile row on signup or RLS blocks the
+  anon read — unresolved, and it means carrier identity cannot render for real
+  users.
+- The `news` and `ai-search` edge functions are written but **not deployed**.
+
+---
+
+## Licence
+
+None yet. All rights reserved until one is chosen.
