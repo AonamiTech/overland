@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { boardCounts, isLive } from '../db';
+import { boardCounts } from '../db';
 import * as supabaseClientModule from '@/auth/supabaseClient';
 
 describe('boardCounts', () => {
@@ -12,7 +12,6 @@ describe('boardCounts', () => {
       throw new Error('Should not be called when not live');
     });
 
-    // Mock isLive to return false
     const isLiveSpy = vi.spyOn(await import('../db'), 'isLive').mockReturnValue(false);
 
     const counts = await boardCounts();
@@ -20,10 +19,16 @@ describe('boardCounts', () => {
   });
 
   it('uses head: true, count: exact so no rows cross the wire when live', async () => {
-    const selectListingsSpy = vi.fn().mockReturnValue({
-      eq: vi.fn().mockResolvedValue({ count: 14, error: null }),
-    });
-    const selectBidsSpy = vi.fn().mockResolvedValue({ count: 42, error: null });
+    const listingsQuery = {
+      eq: vi.fn().mockReturnThis(),
+      gt: vi.fn().mockResolvedValue({ count: 14, error: null }),
+    };
+    const selectListingsSpy = vi.fn().mockReturnValue(listingsQuery);
+
+    const bidsQuery = {
+      eq: vi.fn().mockResolvedValue({ count: 42, error: null }),
+    };
+    const selectBidsSpy = vi.fn().mockReturnValue(bidsQuery);
 
     const fromSpy = vi.fn((table: string) => {
       if (table === 'listings') return { select: selectListingsSpy };

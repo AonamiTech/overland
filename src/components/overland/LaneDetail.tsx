@@ -9,6 +9,7 @@ import { applySeo, laneTitle, laneDescription, laneAnswers, laneJsonLd, laneSlug
 import { money, rpmFmt, type Lane } from '@/lib/market';
 import { laneMiles } from '@/lib/usmap';
 import BidderCard, { BidderDisclaimer } from './BidderCard';
+import ReportModal from './ReportModal';
 
 
 /**
@@ -149,13 +150,14 @@ function RateBreakdown({ lane, best }: { lane: Lane; best: number | null }) {
  * register - one click away. A bid with no name attached to it is not a market, it is
  * a number, and nobody should wire a load against a number.
  */
-function Bidder({ name, onOpen }: { name: string; onOpen: () => void }) {
+function Bidder({ name, onOpen, onReport }: { name: string; onOpen: () => void; onReport?: () => void }) {
   const prof = useMemo(() => allProfiles().find((x) => x.name === name) ?? null, [name]);
   if (!prof) return null;
   const st = stats(prof);
   return (
     <BidderCard
       onOpenProfile={onOpen}
+      onReport={onReport}
       info={{
         name: prof.name, accountType: prof.accountType, orgName: prof.orgName,
         city: prof.city, website: prof.website,
@@ -184,6 +186,7 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
   const [stars, setStars] = useState<0|1|2|3|4|5>(0);
   const [feedback, setFeedback] = useState('');
   const [rated, setRated] = useState(false);
+  const [reporting, setReporting] = useState<{ type: 'listing' | 'bid'; id: string } | null>(null);
 
   useEffect(() => { localStorage.setItem(key, JSON.stringify(offers)); }, [key, offers]);
 
@@ -259,6 +262,7 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                 <div className="aon-num text-[22px]" style={{ color: INK }}>{money(lane.linehaul)}</div>
                 <div className="aon-num text-[12px]" style={{ color: 'rgba(17,17,17,.42)' }}>{rpmFmt(lane.rpm)}/mi</div>
               </div>
+              <button type="button" onClick={() => setReporting({ type: 'listing', id: lane.id })} className="aon-cta aon-cta--ghost">Report load</button>
               <button type="button" onClick={onClose} className="aon-cta aon-cta--ghost">Close</button>
             </div>
           </div>
@@ -339,7 +343,7 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                             <span className="aon-num text-[15px]" style={{ color: mine ? ACCENT : INK }}>{money(o.amount)}</span>
                           </div>
                           {!mine && (
-                            <Bidder name={o.from} onOpen={() => { const pid = profileIdFor(o.from); if (pid) setViewing(pid); }} />
+                            <Bidder name={o.from} onOpen={() => { const pid = profileIdFor(o.from); if (pid) setViewing(pid); }} onReport={() => setReporting({ type: 'bid', id: o.id })} />
                           )}
                           {o.note && <p className="mt-1 text-[13px]" style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.55)' }}>{o.note}</p>}
                           <div className="mt-1 flex items-center justify-between">
@@ -395,6 +399,9 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
           </div>
         </div>
       </div>
+      {reporting && (
+        <ReportModal subjectType={reporting.type} subjectId={reporting.id} onClose={() => setReporting(null)} />
+      )}
     </div>
     </>
   );

@@ -49,7 +49,7 @@ export function BidderDisclaimer() {
   );
 }
 
-export default function BidderCard({ info, onOpenProfile }: { info: BidderInfo; onOpenProfile?: () => void }) {
+export default function BidderCard({ info, onOpenProfile, onReport }: { info: BidderInfo; onOpenProfile?: () => void; onReport?: () => void }) {
   const { user, openAuth } = useAuth();
 
   /* Who is behind an offer is the part worth having an account for. The amount stays
@@ -126,8 +126,6 @@ export default function BidderCard({ info, onOpenProfile }: { info: BidderInfo; 
             key={l.key}
             href={l.href}
             target="_blank"
-            // nofollow + noreferrer: these are user-supplied destinations, so we neither
-            // vouch for them to search engines nor leak our URLs to them.
             rel="noopener noreferrer nofollow"
             onClick={(e) => e.stopPropagation()}
             className="rounded-[6px] px-2 py-[3px] text-[10.5px]"
@@ -148,8 +146,14 @@ export default function BidderCard({ info, onOpenProfile }: { info: BidderInfo; 
             Profile
           </button>
         )}
+        {onReport && (
+          <button type="button" onClick={onReport}
+                  className="rounded-[6px] px-2 py-[3px] text-[10.5px]"
+                  style={{ fontFamily: 'Poppins, sans-serif', color: 'rgba(17,17,17,.4)', border: `1px solid ${HAIR}` }}>
+            Report
+          </button>
+        )}
       </div>
-
     </div>
   );
 }

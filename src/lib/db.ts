@@ -31,6 +31,8 @@ export type Listing = {
   notes: string | null;
   status: 'open' | 'awarded' | 'closed';
   created_at: string;
+  expires_at?: string | null;
+  hidden?: boolean;
 };
 
 export type Bid = {
@@ -41,6 +43,7 @@ export type Bid = {
   note: string | null;
   status: 'open' | 'accepted' | 'withdrawn';
   created_at: string;
+  hidden?: boolean;
 };
 
 export type PublicProfile = {
@@ -66,7 +69,14 @@ async function sb(): Promise<any> {
 export async function fetchListings(kind?: ListingKind): Promise<Listing[]> {
   if (!isLive()) return [];
   const c = await sb();
-  let q = c.from('listings').select('*').eq('status', 'open').order('created_at', { ascending: false });
+  const now = new Date().toISOString();
+  let q = c
+    .from('listings')
+    .select('*')
+    .eq('status', 'open')
+    .eq('hidden', false)
+    .gt('expires_at', now)
+    .order('created_at', { ascending: false });
   if (kind) q = q.eq('kind', kind);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
@@ -89,9 +99,10 @@ export async function boardCounts(): Promise<{ loads: number; bids: number } | n
   if (!isLive()) return null;
   try {
     const c = await sb();
+    const now = new Date().toISOString();
     const [l, b] = await Promise.all([
-      c.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'open'),
-      c.from('bids').select('id', { count: 'exact', head: true }),
+      c.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('hidden', false).gt('expires_at', now),
+      c.from('bids').select('id', { count: 'exact', head: true }).eq('hidden', false),
     ]);
     return { loads: l.count ?? 0, bids: b.count ?? 0 };
   } catch {
@@ -104,7 +115,11 @@ export async function fetchBids(listingId: string): Promise<Bid[]> {
   if (!isLive()) return [];
   const c = await sb();
   const { data, error } = await c
-    .from('bids').select('*').eq('listing_id', listingId).order('amount', { ascending: true });
+    .from('bids')
+    .select('*')
+    .eq('listing_id', listingId)
+    .eq('hidden', false)
+    .order('amount', { ascending: true });
   if (error) throw new Error(error.message);
   return (data ?? []) as Bid[];
 }
@@ -194,4 +209,28 @@ export async function postRating(args: {
     stars: args.stars, note: args.note ?? null,
   });
   if (error) throw new Error(error.message);
+}
+
+/* --------------------------------------------------------------- reports */
+
+export async function reportContent(args: {
+  reporterId: string;
+  subjectType: 'listing' | 'bid' | 'profile';
+  subjectId: string;
+  reason: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  if (!isLive()) return { ok: true };
+  try {
+    const c = await sb();
+    const { error } = await c.from('reports').insert({
+      reporter_id: args.reporterId,
+      subject_type: args.subjectType,
+      subject_id: args.subjectId,
+      reason: args.reason,
+    });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Could not submit report.' };
+  }
 }
