@@ -68,4 +68,5 @@ cd overland      # the extracted folder
 npm install
 npm run dev
 ```
-Deploy: `vercel --prod` (already linked to the `overland` project; needs Vercel auth as `pratikkp24`).
+Deploy through the connected Cloudflare Pages project. The checked-in `vercel.json`
+only redirects any legacy Vercel deployment to the Cloudflare production site.

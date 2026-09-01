@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   AUTH_RETURN_PARAM,
   AUTH_ROLE_PARAM,
+  CANONICAL_APP_ORIGIN,
   DEFAULT_AUTH_RETURN_TO,
   authCallbackUrl,
+  authAppOrigin,
   clearAuthIntent,
   currentAuthReturnTo,
   normalizeAuthReturnTo,
@@ -42,5 +44,11 @@ describe('auth intent', () => {
     expect(currentAuthReturnTo()).toBe(DEFAULT_AUTH_RETURN_TO);
     window.history.replaceState({}, '', '/lane/mem-chi');
     expect(currentAuthReturnTo()).toBe('/lane/mem-chi');
+  });
+
+  it('uses Cloudflare as the hosted OAuth origin while preserving local development origins', () => {
+    expect(authAppOrigin('https://overland-ochre.vercel.app')).toBe(CANONICAL_APP_ORIGIN);
+    expect(authAppOrigin(CANONICAL_APP_ORIGIN)).toBe(CANONICAL_APP_ORIGIN);
+    expect(authAppOrigin('http://localhost:8080')).toBe('http://localhost:8080');
   });
 });

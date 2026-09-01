@@ -8,6 +8,7 @@
 export const DEFAULT_AUTH_RETURN_TO = '/board';
 export const AUTH_RETURN_PARAM = 'overland_return_to';
 export const AUTH_ROLE_PARAM = 'overland_role';
+export const CANONICAL_APP_ORIGIN = 'https://overland-5c4.pages.dev';
 
 const STORAGE_KEY = 'overland.auth.intent.v1';
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -20,6 +21,21 @@ type AuthIntent = {
 };
 
 export type AuthIntentRole = 'shipper' | 'carrier';
+
+/**
+ * Hosted auth always returns to Cloudflare, even if somebody opens an old
+ * Vercel deployment. Local development keeps its own origin for testing.
+ */
+export function authAppOrigin(currentOrigin?: string): string {
+  const origin = currentOrigin ?? (typeof window === 'undefined' ? '' : window.location.origin);
+  try {
+    const parsed = new URL(origin);
+    if (['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname)) return parsed.origin;
+  } catch {
+    // Fall through to the canonical hosted origin.
+  }
+  return CANONICAL_APP_ORIGIN;
+}
 
 export function normalizeAuthReturnTo(value?: string | null): string {
   if (!value || !value.startsWith('/') || value.startsWith('//')) {
@@ -100,7 +116,7 @@ export function currentAuthReturnTo(): string {
 export function authCallbackUrl(): string {
   if (typeof window === 'undefined') return '';
   const target = readAuthIntent() ?? DEFAULT_AUTH_RETURN_TO;
-  const callback = new URL('/', window.location.origin);
+  const callback = new URL('/', authAppOrigin());
   callback.searchParams.set(AUTH_RETURN_PARAM, target);
   const role = readAuthIntentRole();
   if (role) callback.searchParams.set(AUTH_ROLE_PARAM, role);
