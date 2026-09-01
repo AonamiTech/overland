@@ -30,3 +30,4 @@ dist-ssr
 
 # Supabase CLI scratch state (project + org ids, local versions)
 supabase/.temp
+tsconfig.app.tsbuildinfo

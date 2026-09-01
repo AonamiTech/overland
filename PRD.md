@@ -378,6 +378,25 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
 
+### 1 Sep 2026 — component & regression test coverage
+
+Added `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, and `vitest.config.ts` with the `jsdom` environment. Expanded the test suite from pure functions to full component, flow, and database policy coverage (85 passing tests, 5 skipped integration tests).
+
+**Part 3 Component & Flow Tests:**
+- `AuthContext` (`src/auth/__tests__/AuthContext.test.tsx`): verifies implicit-flow hash token parsing via `setSession`, `?code=` exchange via `exchangeCodeForSession`, OAuth provider error flagging (`overland.google_broken`), and `getSupabase()` promise caching across concurrent calls.
+- `RequireAuth` (`src/auth/__tests__/RequireAuth.test.tsx`): verifies rendering is held during `loading` without flashing signed-out states, redirects to `/` only once resolved, and renders children when authenticated.
+- `BidderCard` (`src/components/overland/__tests__/BidderCard.test.tsx`): verifies identity masking for signed-out users, full DOT/MC credentials for signed-in users, and SAFER link URL generation prioritizing USDOT over MC.
+- `LaneDetail` (`src/components/overland/__tests__/LaneDetail.test.tsx`): verifies arithmetic invariant `linehaul === round(miles × rpm / 5) × 5` and auth-gated bid acceptance / contact reveal.
+- `PostListing` (`src/components/overland/__tests__/PostListing.test.tsx`): verifies live vs local mode storage routing, session validation, and ready date floor rules.
+
+**Part 1 Regression Tests:**
+- 1.1 `PostListing`: verified live mode session error surfacing and `localStorage` non-pollution.
+- 1.2 `scrollTo` (`src/lib/__tests__/scrollTo.test.ts`): verified instant fallback when smooth scroll moves nothing, double-scroll prevention, `prefers-reduced-motion: reduce` compliance, and null safety.
+- 1.3 `db.policies` (`src/lib/__tests__/db.policies.test.ts`): integration test suite for RLS policies (owner self-bidding rejection, bid withdrawal permissions, amount/notes limits, self-rating rejection).
+- 1.4 `boardCounts` (`src/lib/__tests__/boardCounts.test.ts`): verified null return when not live, `head: true, count: 'exact'` query options, and error handling.
+- 1.5 Ready dates: verified ready date input `min` attribute equals today in `YYYY-MM-DD`.
+- 1.6 Market rate labels (`src/components/overland/__tests__/marketRatesLabel.test.tsx`): guard test ensuring modelled rates are badged "Indicative" and never "Live".
+
 ### 1 Sep 2026 — audit fixes
 
 Ran the platform as two real users against production and fixed what broke.
@@ -409,6 +428,7 @@ number. Verified live: header reads `Open loads 1` above `1 listing`.
 
 **Ready dates accepted the past.** A live listing was advertising a date that had
 already gone. The picker now floors at today.
+
 
 ### 1 Sep 2026 — lane index simplified
 
