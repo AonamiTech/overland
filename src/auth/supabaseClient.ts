@@ -1,8 +1,8 @@
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from './supabaseConfig';
+
 /**
- * Lazily-created Supabase client.
- *
- * Imported dynamically from AuthContext so the SDK is only pulled into the bundle
- * when the keys actually exist. In local mode this module is never loaded.
+ * Lazily-created Supabase client. The public production configuration lives in
+ * supabaseConfig.ts so browser deployments do not depend on build-time env vars.
  */
 export type SupabaseUserLike = {
   id: string;
@@ -61,13 +61,11 @@ export function getSupabase(): Promise<SupabaseLike> {
 }
 
 async function create(): Promise<SupabaseLike> {
-  const url = import.meta.env.VITE_SUPABASE_URL as string;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
   const mod = await import('@supabase/supabase-js');
   // AuthContext owns callback parsing so it can report provider failures and clean
   // every auth parameter. Leaving automatic URL detection on would make Supabase
   // race the explicit PKCE exchange and turn a useful error into a silent redirect.
-  return mod.createClient(url, key, {
+  return mod.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
       detectSessionInUrl: false,
       flowType: 'pkce',

@@ -11,11 +11,6 @@ const INK = '#111111';
 const ACCENT = '#1E4D6B';
 const DANGER = '#DC2626';
 
-function readGoogleDisabled(): boolean {
-  if (import.meta.env.VITE_GOOGLE_AUTH === 'off') return true;
-  try { return localStorage.getItem('overland.google_broken') === '1'; } catch { return false; }
-}
-
 /**
  * One auth surface with an explicit sign-in/sign-up state. The same surface keeps
  * Google, password and magic-link paths consistent, while signup alone asks for the
@@ -57,7 +52,6 @@ export default function AuthDialog() {
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
-  const [googleOff, setGoogleOff] = useState(readGoogleDisabled);
 
   const isSignIn = view === 'signin';
 
@@ -86,7 +80,6 @@ export default function AuthDialog() {
     setError(null);
     setSent(false);
     setGoogleBusy(false);
-    setGoogleOff(readGoogleDisabled());
   }, [authOpen, pendingAuthMode, pendingRole]);
 
   useEffect(() => {
@@ -541,7 +534,7 @@ export default function AuthDialog() {
               </div>
             </form>
 
-            {mode === 'supabase' && !googleOff && (
+            {mode === 'supabase' && (
               <>
                 <div className="my-5 flex items-center gap-3">
                   <span className="h-px flex-1" style={{ background: 'rgba(17,17,17,.10)' }} />
@@ -558,7 +551,6 @@ export default function AuthDialog() {
                     if (!result.ok) {
                       setError(result.error ?? 'Google sign-in failed.');
                       setGoogleBusy(false);
-                      if (/not available yet/.test(result.error ?? '')) setGoogleOff(true);
                     }
                   }}
                   className="flex w-full items-center justify-center gap-3 rounded-[9px] px-4 py-3 text-[14px] transition-colors hover:bg-[rgba(17,17,17,.03)]"
@@ -577,7 +569,7 @@ export default function AuthDialog() {
 
             {mode === 'local' && (
               <p className="mt-4 text-[12px] leading-[1.6]" style={{ fontFamily: 'Poppins, sans-serif', color: DANGER }}>
-                Demo mode: no email is sent. Create an account on this device, then sign in again with its email. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for real authentication.
+                Demo mode: no email is sent. Create an account on this device, then sign in again with its email.
               </p>
             )}
           </>

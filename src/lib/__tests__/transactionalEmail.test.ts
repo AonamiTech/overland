@@ -9,6 +9,6 @@ describe('Task 9 Transactional Email Setup', () => {
 
     expect(doc).toMatch(/Transactional Auth Email/i);
     expect(doc).toMatch(/auth@overland\.com/i);
-    expect(doc).toMatch(/Local Mode Fallback/i);
+    expect(doc).toMatch(/Client Configuration/i);
   });
 });

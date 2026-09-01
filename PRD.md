@@ -243,10 +243,9 @@ records it as the top risk rather than hiding it.
 
 | Item | State |
 | --- | --- |
-| Google sign-in | **Broken.** Provider Client Secret mismatch in Supabase. Outbound leg verified correct |
+| Google sign-in | **Available in the UI.** Supabase/Google Cloud provider credentials must match for the return exchange |
 | Anonymous reads | **By design, unhandled.** Every policy is `to authenticated`, so a signed-out client reads zero rows. The board is auth-gated, so this bites only if a public browse view is added |
 | Notifications | **Missing.** Nothing tells a poster a bid arrived, or a bidder they were accepted |
-| Google sign-in | **Broken.** Provider Client Secret mismatch in Supabase. Outbound leg verified correct |
 
 ### Should have
 
@@ -390,11 +389,10 @@ immediately; Google, magic-link and email-confirmation callbacks carry the targe
 session storage and a callback query parameter, exchange PKCE codes exactly once,
 remove auth material from the URL, and clean up the Supabase auth listener.
 
-Local mode now keeps a non-secret account/profile registry separate from the active
-session. It never stores a password, signs existing demo accounts back in by email,
-and rejects unknown emails instead of silently creating a new account. Supabase
-password signup/sign-in map returned sessions immediately, so the UI does not depend
-on an eventual auth event.
+The local-mode branches keep a non-secret account/profile registry separate from the
+active session for isolated tests. The normal browser build uses the checked-in
+production Supabase client configuration. Supabase password signup/sign-in map
+returned sessions immediately, so the UI does not depend on an eventual auth event.
 
 Credential-free tests cover the modal states, callback variants, intent validation,
 local re-login storage, immediate Supabase session mapping and Google failure copy.
@@ -459,7 +457,7 @@ Completed all twelve core tasks from `ANTIGRAVITY-TASK.md` to establish a comple
 Added `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, and `vitest.config.ts` with the `jsdom` environment. Expanded the test suite from pure functions to full component, flow, and database policy coverage (85 passing tests, 5 skipped integration tests).
 
 **Part 3 Component & Flow Tests:**
-- `AuthContext` (`src/auth/__tests__/AuthContext.test.tsx`): verifies implicit-flow hash token parsing via `setSession`, `?code=` exchange via `exchangeCodeForSession`, OAuth provider error flagging (`overland.google_broken`), and `getSupabase()` promise caching across concurrent calls.
+- `AuthContext` (`src/auth/__tests__/AuthContext.test.tsx`): verifies implicit-flow hash token parsing via `setSession`, `?code=` exchange via `exchangeCodeForSession`, actionable OAuth provider errors without suppressing Google, and `getSupabase()` promise caching across concurrent calls.
 - `RequireAuth` (`src/auth/__tests__/RequireAuth.test.tsx`): verifies rendering is held during `loading` without flashing signed-out states, redirects to `/` only once resolved, and renders children when authenticated.
 - `BidderCard` (`src/components/overland/__tests__/BidderCard.test.tsx`): verifies identity masking for signed-out users, full DOT/MC credentials for signed-in users, and SAFER link URL generation prioritizing USDOT over MC.
 - `LaneDetail` (`src/components/overland/__tests__/LaneDetail.test.tsx`): verifies arithmetic invariant `linehaul === round(miles × rpm / 5) × 5` and auth-gated bid acceptance / contact reveal.
@@ -520,14 +518,10 @@ step was already optional, but with only a text link at the foot it read as a wa
 
 ### 31 Aug 2026 — auth restructured around what works
 
-Email sign-up and sign-in were verified end to end; Google fails on the return leg
-with `Unable to exchange external code`, a provider credential mismatch that cannot be
-fixed from the application. So the working path leads: the email form is open by
-default and Google sits below it behind an "or" divider.
-
-A failed Google return records itself in `localStorage` and stops offering the button
-on that device, clearing itself once a sign-in succeeds — so fixing the secret needs
-no redeploy. `VITE_GOOGLE_AUTH=off` hides it globally.
+Email sign-up and sign-in were verified end to end; Google remains visible below the
+email form behind an "or" divider. If the provider returns `Unable to exchange external
+code`, the app shows an actionable error and keeps the option available for another
+attempt while the Supabase/Google Cloud credentials are corrected.
 
 Two upstream bugs were fixed to get there: `getSupabase()` cached the client rather
 than the promise, so concurrent callers each built their own `GoTrueClient` on one

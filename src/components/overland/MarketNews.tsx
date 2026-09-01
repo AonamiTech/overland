@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SUPABASE_URL } from '@/auth/supabaseConfig';
 
 /**
  * Market headlines from publisher RSS, via the `news` edge function.
@@ -30,10 +31,7 @@ export default function MarketNews() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const base = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-    if (!base) { setLoading(false); return; }
-
-    fetch(`${base}/functions/v1/news`)
+    fetch(`${SUPABASE_URL}/functions/v1/news`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((d) => setItems(Array.isArray(d.items) ? d.items : []))
       .catch(() => setItems([]))

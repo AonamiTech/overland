@@ -245,7 +245,7 @@ describe('AuthContext', () => {
     expect(window.location.search).toBe('');
   });
 
-  it('provider failure sets overland.google_broken in localStorage; session success clears it', async () => {
+  it('surfaces provider failure without suppressing future Google attempts', async () => {
     const mockGetSession = vi.fn().mockResolvedValue({ data: { session: null } });
 
     const mockSb = {
@@ -261,18 +261,17 @@ describe('AuthContext', () => {
 
     window.history.replaceState({}, '', '/?error_description=Unable+to+exchange+external+code');
 
-    render(
+    const firstRender = render(
       <AuthProvider>
         <TestConsumer />
       </AuthProvider>
     );
 
-    await waitFor(() => {
-      expect(localStorage.getItem('overland.google_broken')).toBe('1');
-    });
+    await waitFor(() => expect(screen.getByTestId('error')).toBeInTheDocument());
     expect(screen.getByTestId('error').textContent).toContain('Google sign-in is temporarily unavailable');
+    expect(localStorage.getItem('overland.google_broken')).toBeNull();
 
-    // Now test success clearing the flag
+    // A later successful session does not need to clear a suppression flag.
     const mockUserSession = {
       user: {
         id: 'usr_1',
@@ -282,6 +281,7 @@ describe('AuthContext', () => {
     };
     mockGetSession.mockResolvedValueOnce({ data: { session: mockUserSession } });
 
+    firstRender.unmount();
     window.history.replaceState({}, '', '/');
 
     render(
@@ -290,8 +290,7 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    await waitFor(() => {
-      expect(localStorage.getItem('overland.google_broken')).toBeNull();
-    });
+    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('user@example.com'));
+    expect(localStorage.getItem('overland.google_broken')).toBeNull();
   });
 });

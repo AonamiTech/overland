@@ -1,12 +1,13 @@
 import { getSupabase } from '@/auth/supabaseClient';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/auth/supabaseConfig';
 
 /**
  * Data access for the board.
  *
  * Every table read/write goes through here so components never touch Supabase
  * directly. That keeps RLS reasoning in one place and makes the demo/real split
- * explicit: `isLive()` is false until the keys are set, and callers fall back to the
- * seeded fixtures rather than rendering an empty board.
+ * explicit: `isLive()` reflects the public production client configuration, and
+ * callers fall back to the seeded fixtures rather than rendering an empty board.
  *
  * Contact details are deliberately not selectable from `profiles` - they live in
  * `profile_contacts`, which RLS only exposes to the owner or an accepted-deal
@@ -14,7 +15,7 @@ import { getSupabase } from '@/auth/supabaseClient';
  */
 
 export const isLive = () =>
-  Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+  Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export type ListingKind = 'load' | 'truck';
 

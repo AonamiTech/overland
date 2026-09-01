@@ -18,6 +18,7 @@ import {
   saveLocalAccount,
   writeLocalSession,
 } from './localStore';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from './supabaseConfig';
 import type { SupabaseSessionLike } from './supabaseClient';
 
 export type Role = 'shipper' | 'carrier';
@@ -82,9 +83,7 @@ type AuthValue = {
   pendingAuthMode?: AuthView;
 };
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-export const AUTH_MODE: AuthMode = SUPABASE_URL && SUPABASE_KEY ? 'supabase' : 'local';
+export const AUTH_MODE: AuthMode = SUPABASE_URL && SUPABASE_ANON_KEY ? 'supabase' : 'local';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const AUTH_QUERY_PARAMS = [
@@ -102,10 +101,6 @@ const AUTH_QUERY_PARAMS = [
 
 function cleanEmail(email: string): string {
   return email.trim().toLowerCase();
-}
-
-function clearGoogleFailureMarker(): void {
-  try { localStorage.removeItem('overland.google_broken'); } catch { /* storage unavailable */ }
 }
 
 function sessionUser(session: SupabaseSessionLike | null, fallbackRole?: Role): User | null {
@@ -207,7 +202,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const next = sessionUser(session, readAuthIntentRole() ?? undefined);
           setUser(next);
           if (next) {
-            clearGoogleFailureMarker();
             setAuthError(null);
           }
         });
@@ -243,9 +237,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (callbackErrorValue) {
           const plain = decodeCallbackError(callbackErrorValue);
           const providerBroken = /unable to exchange external code|unsupported provider|provider is not enabled/i.test(plain);
-          if (providerBroken) {
-            try { localStorage.setItem('overland.google_broken', '1'); } catch { /* private mode */ }
-          }
           if (!cancelled) {
             setAuthError(
               providerBroken
@@ -285,7 +276,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (sessionError && !cancelled) setAuthError(`Could not restore your session: ${sessionError.message}`);
         const restored = sessionUser(data.session, readAuthIntentRole() ?? callbackRole);
         if (restored) {
-          clearGoogleFailureMarker();
           if (!cancelled) {
             setUser(restored);
             setAuthError(null);
@@ -368,7 +358,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         const signedIn = sessionUser(data.session, role);
         if (signedIn) {
-          clearGoogleFailureMarker();
           setUser(signedIn);
           setAuthError(null);
           return { ok: true, emailed: false };
@@ -415,7 +404,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         const signedIn = sessionUser(data.session);
         if (!signedIn) return { ok: false, error: 'Could not start a session.' };
-        clearGoogleFailureMarker();
         setUser(signedIn);
         setAuthError(null);
         return { ok: true, emailed: false };
@@ -532,9 +520,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         if (error) {
           const notConfigured = /provider is not enabled|unsupported provider/i.test(error.message);
-          if (notConfigured) {
-            try { localStorage.setItem('overland.google_broken', '1'); } catch { /* private mode */ }
-          }
           return {
             ok: false,
             error: notConfigured

@@ -24,9 +24,9 @@ npm run dev           # localhost:8080
 `"files": []`, so only `tsc -b` walks the project references. Never verify with the
 bare form.
 
-**Local mode.** With `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` unset the app
-signs in immediately against `localStorage` and sends no email. Fastest way to
-exercise UI. Create `.env.local` with both keys blank to force it.
+**Client configuration.** The browser uses the production Supabase URL and anon key
+from `src/auth/supabaseConfig.ts`. Local-mode branches remain available for isolated
+tests, but normal builds use Supabase directly.
 
 **The tests are persona-driven.** `src/test/personas.ts` defines five users, each
 covering a path the others cannot. Add to that file rather than inventing new
@@ -147,10 +147,9 @@ Outbound leg verified correct: valid `client_id`, `redirect_uri`, `code_challeng
 the Google **Client Secret in Supabase → Authentication → Providers → Google** does
 not match Google Cloud Console.
 
-**Do not attempt a code fix.** The app already handles it: a failed return records
-`overland.google_broken` in `localStorage`, hides the button on that device, and
-clears the flag once a sign-in succeeds — so fixing the secret needs no redeploy.
-`VITE_GOOGLE_AUTH=off` hides it globally.
+The app reports the provider error, keeps email/password sign-in available, and leaves
+the Google option visible for another attempt. The provider secret still must match
+Google Cloud Console; that configuration cannot be repaired from browser code.
 
 ### 2.2 No notifications — the biggest product gap
 
@@ -214,7 +213,7 @@ Priority order:
 1. **`AuthContext`** — `src/auth/__tests__/AuthContext.test.tsx`
    - implicit-flow tokens in the URL fragment call `setSession` and clear the hash
    - `?code=` calls `exchangeCodeForSession`
-   - provider failure sets `overland.google_broken`; success clears it
+   - provider failure is surfaced without suppressing later Google attempts
    - `getSupabase()` caches the **promise**, so two concurrent callers get one client
      *(this was a real bug: caching the client let each caller build its own
      GoTrueClient on one storage key, which is fatal under PKCE)*

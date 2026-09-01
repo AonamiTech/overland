@@ -107,7 +107,7 @@ describe('AuthDialog', () => {
     expect(screen.getByLabelText('Email')).toHaveValue('driver@example.com');
   });
 
-  it('turns a provider failure into an actionable error and hides the broken Google option', async () => {
+  it('turns a provider failure into an actionable error and keeps Google available', async () => {
     setupAuth({
       mode: 'supabase',
       signInWithGoogle: vi.fn().mockResolvedValue({ ok: false, error: 'Google sign-in is not available yet. Use your email instead.' }),
@@ -118,6 +118,6 @@ describe('AuthDialog', () => {
     fireEvent.click(google);
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/Google sign-in is not available yet/i);
-    expect(screen.queryByRole('button', { name: 'Continue with Google' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeInTheDocument();
   });
 });

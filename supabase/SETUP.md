@@ -127,8 +127,11 @@ In your DNS provider for `overland.com`, add:
 - **DKIM TXT Record:** Provided by your email provider
 - **DMARC TXT Record:** `v=DMARC1; p=none; rua=mailto:dmarc@overland.com`
 
-### 3. Local Mode Fallback
-When `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are blank in `.env.local`, Overland runs in local mode: authentication is immediate via `localStorage` and no emails are sent.
+### 3. Client Configuration
+The browser client uses the production Supabase URL and anon key checked into
+`src/auth/supabaseConfig.ts`, so deployed builds do not need `VITE_SUPABASE_*`
+variables. The anon key is public and protected by RLS; never put a `service_role` key
+in client code. Local-mode branches remain available for isolated tests.
 
 ---
 
@@ -150,9 +153,9 @@ button:
    query parameter to that root callback so a visitor returns to the page that opened
    sign-in.
 
-Set `VITE_GOOGLE_AUTH=off` while the provider is incomplete. A failed exchange is
-reported in the app and the Google button is suppressed on that browser until a later
-successful session clears the marker.
+The Google option remains visible even when a provider attempt fails. The app reports
+the provider error and keeps email/password and magic-link sign-in available while the
+Supabase/Google Cloud configuration is corrected.
 
 ## 7. RLS Integration Test Suite (Dedicated Test Project)
 
@@ -167,4 +170,3 @@ export SUPABASE_TEST_USER2_EMAIL="user2@test.com"
 export SUPABASE_TEST_USER2_PASS="password123"
 ```
 When these variables are absent, the 8 integration tests skip gracefully to avoid modifying production data or failing without credentials.
-

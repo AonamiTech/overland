@@ -55,22 +55,12 @@ describe('Task 4 Abuse Controls & DB Filters', () => {
 
     vi.spyOn(supabaseClient, 'getSupabase').mockResolvedValue(mockSb as any);
 
-    const origUrl = import.meta.env.VITE_SUPABASE_URL;
-    const origKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    (import.meta.env as any).VITE_SUPABASE_URL = 'https://fake.supabase.co';
-    (import.meta.env as any).VITE_SUPABASE_ANON_KEY = 'fake-key';
-
-    try {
-      await fetchListings();
-      expect(mockSb.from).toHaveBeenCalledWith('listings');
-      expect(mockEq1).toHaveBeenCalledWith('status', 'open');
-      expect(mockEq2).toHaveBeenCalledWith('hidden', false);
-      expect(mockOr).toHaveBeenCalledWith(expect.stringContaining('expires_at.is.null'));
-    } finally {
-      (import.meta.env as any).VITE_SUPABASE_URL = origUrl;
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY = origKey;
-      vi.restoreAllMocks();
-    }
+    await fetchListings();
+    expect(mockSb.from).toHaveBeenCalledWith('listings');
+    expect(mockEq1).toHaveBeenCalledWith('status', 'open');
+    expect(mockEq2).toHaveBeenCalledWith('hidden', false);
+    expect(mockOr).toHaveBeenCalledWith(expect.stringContaining('expires_at.is.null'));
+    vi.restoreAllMocks();
   });
 
   it('fetchBids filters out hidden bids when live', async () => {
@@ -93,20 +83,10 @@ describe('Task 4 Abuse Controls & DB Filters', () => {
 
     vi.spyOn(supabaseClient, 'getSupabase').mockResolvedValue(mockSb as any);
 
-    const origUrl = import.meta.env.VITE_SUPABASE_URL;
-    const origKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-    (import.meta.env as any).VITE_SUPABASE_URL = 'https://fake.supabase.co';
-    (import.meta.env as any).VITE_SUPABASE_ANON_KEY = 'fake-key';
-
-    try {
-      await fetchBids('lst_123');
-      expect(mockSb.from).toHaveBeenCalledWith('bids');
-      expect(mockEq1).toHaveBeenCalledWith('listing_id', 'lst_123');
-      expect(mockEq2).toHaveBeenCalledWith('hidden', false);
-    } finally {
-      (import.meta.env as any).VITE_SUPABASE_URL = origUrl;
-      (import.meta.env as any).VITE_SUPABASE_ANON_KEY = origKey;
-      vi.restoreAllMocks();
-    }
+    await fetchBids('lst_123');
+    expect(mockSb.from).toHaveBeenCalledWith('bids');
+    expect(mockEq1).toHaveBeenCalledWith('listing_id', 'lst_123');
+    expect(mockEq2).toHaveBeenCalledWith('hidden', false);
+    vi.restoreAllMocks();
   });
 });

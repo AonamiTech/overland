@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SUPABASE_URL } from '@/auth/supabaseConfig';
 import { parseQuery, type ParsedQuery } from '@/lib/parseQuery';
 
 /**
@@ -35,12 +36,9 @@ export default function SmartSearch({
       return;
     }
 
-    const base = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-    if (!base) { setParsed(local); onParsed(local); setNote('Could not interpret that.'); return; }
-
     setBusy(true);
     try {
-      const r = await fetch(`${base}/functions/v1/ai-search`, {
+      const r = await fetch(`${SUPABASE_URL}/functions/v1/ai-search`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ q: value }),
