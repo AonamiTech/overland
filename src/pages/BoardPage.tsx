@@ -8,6 +8,7 @@ import PostListing from '@/components/overland/PostListing';
 import SmartSearch from '@/components/overland/SmartSearch';
 import type { ParsedQuery } from '@/lib/parseQuery';
 import LiveListings from '@/components/overland/LiveListings';
+import { boardCounts, isLive } from '@/lib/db';
 import { events } from '@/lib/analytics';
 import {
   buildLanes, tick, nationalIndex, money, rpmFmt, sparkPath,
@@ -51,6 +52,13 @@ export default function BoardPage() {
   const [open, setOpen] = useState<Lane | null>(null);
   const [posting, setPosting] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  /* Real board totals. The header used to print the seeded lane model's figures,
+     so the page could claim 143 open loads directly above a board holding one. */
+  const [counts, setCounts] = useState<{ loads: number; bids: number } | null>(null);
+  useEffect(() => { let off = false;
+    boardCounts().then((c) => { if (!off) setCounts(c); }).catch(() => {});
+    return () => { off = true; };
+  }, []);
   const { slug } = useParams();
 
   /* A shared /lane/lax-dfw link should land on that lane's detail, not the bare board. */
@@ -188,9 +196,13 @@ export default function BoardPage() {
 
             <dl className="grid grid-cols-3 gap-8">
               {[
-                ['Open loads', lanes.reduce((a, l) => a + l.loads, 0).toLocaleString()],
-                ['Bids today', lanes.reduce((a, l) => a + l.bids, 0).toLocaleString()],
-                ['Lanes', String(lanes.length)],
+                // Real counts when the backend is live; a dash while they load, never
+                // a simulated number dressed as a real one.
+                ['Open loads', isLive() ? (counts ? counts.loads.toLocaleString() : '—')
+                                        : lanes.reduce((a, l) => a + l.loads, 0).toLocaleString()],
+                ['Bids placed', isLive() ? (counts ? counts.bids.toLocaleString() : '—')
+                                         : lanes.reduce((a, l) => a + l.bids, 0).toLocaleString()],
+                ['Lanes priced', String(lanes.length)],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="aon-eyebrow" style={{ color: 'rgba(255,255,255,.45)' }}>{k}</dt>

@@ -84,6 +84,22 @@ export async function createListing(
 
 /* ------------------------------------------------------------------- bids */
 
+/** Board totals for the header. Counted with head+exact so no rows cross the wire. */
+export async function boardCounts(): Promise<{ loads: number; bids: number } | null> {
+  if (!isLive()) return null;
+  try {
+    const c = await sb();
+    const [l, b] = await Promise.all([
+      c.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+      c.from('bids').select('id', { count: 'exact', head: true }),
+    ]);
+    return { loads: l.count ?? 0, bids: b.count ?? 0 };
+  } catch {
+    // A failed count must not blank the header - the caller falls back to a dash.
+    return null;
+  }
+}
+
 export async function fetchBids(listingId: string): Promise<Bid[]> {
   if (!isLive()) return [];
   const c = await sb();

@@ -77,10 +77,15 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
     };
 
     try {
-      if (isLive() && user) {
+      if (isLive()) {
+        /* Never fall through to local storage while a real backend is configured.
+           The old condition was `isLive() && user`, so a missing session sent the
+           listing to localStorage and still reported success - the poster saw
+           "it is on the board" for a row that existed only in their browser. */
+        if (!user) throw new Error('Your session expired. Sign in again and repost.');
         await createListing({ ...row, owner_id: user.id });
       } else {
-        // No database yet: keep it locally so the flow is testable, and be honest in the UI.
+        // No database configured: keep it locally so the flow is testable, and say so.
         const mine = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
         mine.unshift({ ...row, id: `local-${Date.now()}`, created_at: new Date().toISOString() });
         localStorage.setItem(LOCAL_KEY, JSON.stringify(mine));
@@ -178,6 +183,9 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
                   <div>
                     <label className="aon-eyebrow block" htmlFor="ov-ready">Ready</label>
                     <input id="ov-ready" type="date" value={ready} onChange={(e) => setReady(e.target.value)}
+                           /* A listing ready before today reads as stale the moment it
+                              is posted; the board had one dated yesterday. */
+                           min={new Date().toISOString().slice(0, 10)}
                            className={field} style={sty} />
                   </div>
                 </div>
