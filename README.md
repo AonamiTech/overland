@@ -128,6 +128,7 @@ one screen is the most common visual bug in this repo.** Read
 | File | What it covers |
 |---|---|
 | [PRD.md](PRD.md) | What the product is, who it serves, and what is in and out of scope |
+| [AUDIT-BRIEF.md](AUDIT-BRIEF.md) | Open bugs, missing test coverage, and the work order for fixing them |
 | [DESIGN.md](DESIGN.md) | The design system, the two layers, and the footguns that have actually bitten |
 | [LEGAL-NOTES.md](LEGAL-NOTES.md) | Broker-status boundary and what must never be built |
 | [supabase/SETUP.md](supabase/SETUP.md) | Database setup and migrations |
