@@ -378,6 +378,20 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
 
+### 1 Sep 2026 — Work Order 2 gap close-out
+
+Completed all nine close-out tasks from `ANTIGRAVITY-TASK-2.md`:
+
+1. **News Edge Function Restoration (Task 1):** Restored `supabase/functions/news/index.ts` from git history to maintain repository authority over live production code called by `MarketNews.tsx`.
+2. **Database Profile Gate (Task 2):** Created `supabase/migrations/0006_public_profiles_view.sql` revoking direct `anon` access on `public.profiles` and introducing `public.public_profiles` view containing non-identifying fields (`id`, `role`, `account_type`, `city`, `created_at`).
+3. **Database Error Handling & Expiry Alignment (Task 3):** Handled PostgreSQL rate limit (`P0001`) and constraint errors in `PostListing.tsx` and `BidSheet` with `#DC2626` text formatting. Aligned `expires_at` filters in `src/lib/db.ts` to match `0005_anon_read.sql` policy (`expires_at is null or expires_at > now()`).
+4. **Report Path Verification (Task 4):** Verified end-to-end user report insertion into `public.reports` and documented operator SQL audit queries in `README.md`.
+5. **RLS Integration Test Harness (Task 5):** Expanded `src/lib/__tests__/db.policies.test.ts` to cover 8 integration scenarios against a test project, skipping gracefully when credentials are absent.
+6. **Notifications Trigger & Function (Task 6):** Created `supabase/migrations/0007_notifications.sql` and updated `send-deal-email` Edge Function to handle `bid_placed` and `deal_accepted` events with `notify_email` preference check and per-listing hourly caps.
+7. **Accessibility Enhancements (Task 7):** Added ARIA dialog roles (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`) to `AuthDialog.tsx` and `PostListing.tsx`. Added test suite `Accessibility.test.tsx`.
+8. **Theme Resolution (Task 8):** Removed unimported secondary `src/theme.css` file to keep `src/index.css` as single source of truth.
+9. **Platform Action Items (Task 9):** Documented platform setup steps for Pratik in `README.md` and `PRODUCTION_PROGRESS.md`.
+
 ### 1 Sep 2026 — 12-task production readiness overhaul
 
 Completed all twelve core tasks from `ANTIGRAVITY-TASK.md` to establish a complete operational and legal floor for production:
