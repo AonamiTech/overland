@@ -103,3 +103,31 @@ In Supabase Dashboard → **Database** → **Webhooks**, create a Webhook:
 
 If credentials are absent, the edge function logs `[WARN]` and returns `{ status: "skipped" }` without interrupting the transaction.
 
+---
+
+## 5. Transactional Auth Email (Custom SMTP & Domain)
+
+By default, Supabase Auth uses a shared built-in email provider with strict hourly rate limits (3 emails/hour).
+
+To use production magic links from `auth@overland.com`:
+
+### 1. Configure Custom SMTP in Supabase Dashboard
+Go to **Project Settings** → **Authentication** → **SMTP Settings**:
+- **Enable Custom SMTP:** On
+- **Sender email:** `auth@overland.com`
+- **Sender name:** `Overland`
+- **Host:** `smtp.resend.com` (or SendGrid `smtp.sendgrid.net`)
+- **Port:** `587` (TLS)
+- **Username:** `resend` (or `apikey`)
+- **Password:** `<YOUR_SMTP_API_KEY>`
+
+### 2. DNS Verification (overland.com)
+In your DNS provider for `overland.com`, add:
+- **SPF Record:** `v=spf1 include:amazonses.com ~all` (or provider specific)
+- **DKIM TXT Record:** Provided by your email provider
+- **DMARC TXT Record:** `v=DMARC1; p=none; rua=mailto:dmarc@overland.com`
+
+### 3. Local Mode Fallback
+When `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are blank in `.env.local`, Overland runs in local mode: authentication is immediate via `localStorage` and no emails are sent.
+
+
