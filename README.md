@@ -128,6 +128,7 @@ one screen is the most common visual bug in this repo.** Read
 | File | What it covers |
 |---|---|
 | [PRD.md](PRD.md) | What the product is, who it serves, and what is in and out of scope |
+| [PROD-READINESS.md](PROD-READINESS.md) | What blocks a production launch, in priority order |
 | [AUDIT-BRIEF.md](AUDIT-BRIEF.md) | Open bugs, missing test coverage, and the work order for fixing them |
 | [DESIGN.md](DESIGN.md) | The design system, the two layers, and the footguns that have actually bitten |
 | [LEGAL-NOTES.md](LEGAL-NOTES.md) | Broker-status boundary and what must never be built |
@@ -139,26 +140,34 @@ one screen is the most common visual bug in this repo.** Read
 
 ## Known state
 
-- **Email sign-up and sign-in work end to end.** Verified against production.
-- **Google sign-in is not working.** The outbound leg reaches Google correctly;
-  the return fails with `Unable to exchange external code`, which means the Google
-  **Client Secret in the Supabase provider settings does not match** Google Cloud
-  Console. A failed return now disables the button on that device and clears
-  itself once a sign-in succeeds, so fixing the secret needs no redeploy.
-- **Anonymous clients read nothing.** `listings`, `bids` and `profiles` all return
-  zero rows without a session — RLS has no anon SELECT policy. Signed-in users see
-  each other's data correctly, so the marketplace works; but any public "browse
-  loads" page would render empty.
-- **Posting a load from the UI can silently fail.** The dialog closes with no error
-  and no row is created. Reproduced during the September audit.
-- **Self-bidding is not blocked.** A listing owner can bid on their own load, which
-  poisons the public bid record the product is built on. `0002_harden.sql` declares
-  the constraint, so it appears never to have been applied.
-- **Bids cannot be withdrawn.** `DELETE` returns 204 and removes nothing — there is
-  no delete policy, so deny-by-default silently wins.
-- **The board header shows simulated figures next to real ones.** "Open loads" and
-  "Bids today" are computed from the seeded lane model, so the page can claim 143
-  open loads directly above a board holding one.
+**Fixed and now covered by regression tests** (see `AUDIT-BRIEF.md` Part 1):
+posting no longer reports success while writing nothing; smooth scrolling has a
+working fallback; self-bidding is rejected and bids can be withdrawn, after
+`0002_harden.sql` turned out never to have been applied; the board header no
+longer prints modelled figures beside real ones; ready dates cannot be in the
+past; modelled rates are badged "Indicative" rather than "Live".
+
+Open, in priority order — the detail and the work order are in
+[PROD-READINESS.md](PROD-READINESS.md):
+
+- **~24 legacy routes are publicly reachable and advertise commission tracking,
+  escrow and an insurance hub** — none of which this product offers, and all of
+  which its legal posture depends on not offering. Highest priority in the repo.
+- **No CI.** The 85 tests run only when someone remembers.
+- **No error or uptime monitoring.** A white screen is invisible until reported.
+- **Auth email uses Supabase's built-in sender**, which is rate-limited and not
+  for production. Testing hit 429.
+- **No rate limiting, listing expiry, or way to remove a fraudulent listing.**
+- **Google sign-in is not working.** The outbound leg is correct; the return
+  fails with `Unable to exchange external code`, meaning the Client Secret in the
+  Supabase provider settings does not match Google Cloud Console. A failed return
+  disables the button on that device and clears itself on success, so fixing the
+  secret needs no redeploy.
+- **Anonymous clients read nothing.** No anon SELECT policy, so lane pages render
+  empty for Googlebot — which the acquisition plan depends on. Decision made to
+  open `listings` and public `profiles` columns; not yet done.
+- **No notifications.** Nothing tells a poster a bid arrived, or a bidder they
+  won. The largest retention gap.
 - The `news` and `ai-search` edge functions are written but **not deployed**.
 
 ---
