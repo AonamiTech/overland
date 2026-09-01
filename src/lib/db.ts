@@ -167,7 +167,11 @@ export async function setDealStatus(dealId: string, status: 'confirmed' | 'fell_
 export async function getPublicProfile(id: string): Promise<PublicProfile | null> {
   if (!isLive()) return null;
   const c = await sb();
-  const { data } = await c.from('profiles').select('*').eq('id', id).maybeSingle();
+  const { data: session } = await c.auth.getSession().catch(() => ({ data: { session: null } }));
+  const isAuth = Boolean(session?.session?.user);
+
+  const table = isAuth ? 'profiles' : 'public_profiles';
+  const { data } = await c.from(table).select('*').eq('id', id).maybeSingle();
   return (data as PublicProfile) ?? null;
 }
 
@@ -177,7 +181,11 @@ export async function getPublicProfile(id: string): Promise<PublicProfile | null
 export async function getPublicProfiles(ids: string[]): Promise<Record<string, PublicProfile>> {
   if (!isLive() || ids.length === 0) return {};
   const c = await sb();
-  const { data } = await c.from('profiles').select('*').in('id', Array.from(new Set(ids)));
+  const { data: session } = await c.auth.getSession().catch(() => ({ data: { session: null } }));
+  const isAuth = Boolean(session?.session?.user);
+
+  const table = isAuth ? 'profiles' : 'public_profiles';
+  const { data } = await c.from(table).select('*').in('id', Array.from(new Set(ids)));
   const out: Record<string, PublicProfile> = {};
   for (const p of (data ?? []) as PublicProfile[]) out[p.id] = p;
   return out;
