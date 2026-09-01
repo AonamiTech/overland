@@ -131,7 +131,7 @@ src/
   test/                  Persona-driven tests
 supabase/
   migrations/            0001_init · 0002_harden · 0003_website
-  functions/             news · ai-search (Deno)
+  functions/             news · send-deal-email (Deno)
 ```
 
 Two design layers coexist in `src/index.css`: `.aon-*` is current and owns the
@@ -170,7 +170,7 @@ one screen is the most common visual bug in this repo.** Read
 - **Email Notifications (Task 8):** Deployed `send-deal-email` Edge Function in `supabase/functions/send-deal-email/` with safe fallback when SMTP keys are absent.
 - **Transactional Auth Email (Task 9):** Documented Custom SMTP and Domain DNS setup (`auth@overland.com`) in `supabase/SETUP.md`.
 - **Funnel Instrumentation (Task 10):** Implemented five cookieless funnel events (`landing`, `signup_started`, `signup_completed`, `first_action`, `deal_accepted`) guarded on environment variables.
-- **Performance & Cleanup (Task 11):** Integrated `theme.css` into `main.tsx` and removed unused `news` and `ai-search` edge functions.
+- **Performance & Cleanup (Task 11):** `theme.css` was imported into `main.tsx` and then removed — it broke dark mode (147 elements below 3:1, several invisible), because `index.css` hardcodes light values. The file was subsequently deleted. `ai-search` was dropped; `news` is deployed and kept.
 - **Documentation Updated (Task 12):** Updated `PRD.md`, `README.md`, `DESIGN.md`, and `.env.example`.
 
 ---
