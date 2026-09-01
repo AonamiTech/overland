@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
+import { readAuthIntent } from '@/auth/authIntent';
 import MobileTabBar from '@/components/overland/MobileTabBar';
 import InstallPrompt from '@/components/overland/InstallPrompt';
 import HeroDirect from '@/components/overland/HeroDirect';
@@ -44,6 +45,10 @@ const Index = () => {
   // Signed-in users land on the board, but the wordmark links here with ?home=1 so
   // the marketing page stays reachable rather than being an infinite bounce.
   const wantsHome = new URLSearchParams(window.location.search).has('home');
+  const authDestination = readAuthIntent();
+  if (user && !wantsHome && authDestination && authDestination !== '/') {
+    return <Navigate to={authDestination} replace />;
+  }
   if (user && !wantsHome) return <Navigate to="/board" replace />;
 
   return (

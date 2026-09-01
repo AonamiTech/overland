@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { DEFAULT_AUTH_RETURN_TO, readAuthIntent } from '@/auth/authIntent';
 
 /**
  * Surfaces a failure that happened during the OAuth return.
@@ -10,12 +11,12 @@ import { useAuth } from '@/auth/AuthContext';
  * at that point, so the message needs somewhere top-level to live.
  */
 export default function AuthErrorBanner() {
-  const { authError, user, openAuth } = useAuth();
+  const { authError, user, openAuth, authOpen } = useAuth();
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => { if (authError) setDismissed(false); }, [authError]);
 
-  if (!authError || user || dismissed) return null;
+  if (!authError || user || dismissed || authOpen) return null;
 
   return (
     <div
@@ -24,7 +25,11 @@ export default function AuthErrorBanner() {
       style={{ background: '#DC2626', color: '#FFFFFF', fontFamily: 'Poppins, sans-serif' }}
     >
       <span className="text-[13px]">{authError}</span>
-      <button type="button" onClick={() => openAuth()} className="text-[13px] underline underline-offset-2">
+      <button
+        type="button"
+        onClick={() => openAuth({ mode: 'signin', returnTo: readAuthIntent() ?? DEFAULT_AUTH_RETURN_TO })}
+        className="text-[13px] underline underline-offset-2"
+      >
         Try again
       </button>
       <button type="button" onClick={() => setDismissed(true)} aria-label="Dismiss" className="text-[15px] leading-none">

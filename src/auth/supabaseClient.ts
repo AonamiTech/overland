@@ -4,22 +4,39 @@
  * Imported dynamically from AuthContext so the SDK is only pulled into the bundle
  * when the keys actually exist. In local mode this module is never loaded.
  */
-type SupabaseLike = {
+export type SupabaseUserLike = {
+  id: string;
+  email?: string;
+  created_at?: string;
+  user_metadata?: Record<string, unknown>;
+};
+
+export type SupabaseSessionLike = {
+  user: SupabaseUserLike;
+};
+
+type AuthSubscription = {
+  data?: { subscription?: { unsubscribe(): void } };
+  unsubscribe?: () => void;
+};
+
+export type SupabaseLike = {
   auth: {
-    getSession(): Promise<{ data: { session: null | { user: { id: string; email?: string; created_at?: string; user_metadata?: Record<string, unknown> } } } }>;
-    onAuthStateChange(cb: (event: string, session: null | { user: { id: string; email?: string; created_at?: string; user_metadata?: Record<string, unknown> } }) => void): unknown;
+    getSession(): Promise<{ data: { session: SupabaseSessionLike | null }; error?: { message: string } | null }>;
+    onAuthStateChange(cb: (event: string, session: SupabaseSessionLike | null) => void): AuthSubscription;
     signInWithOtp(args: { email: string; options?: Record<string, unknown> }): Promise<{ error: { message: string } | null }>;
     signUp(args: { email: string; password: string; options?: Record<string, unknown> }): Promise<{
-      data: { session: unknown | null; user: unknown | null };
+      data: { session: SupabaseSessionLike | null; user: SupabaseUserLike | null };
       error: { message: string } | null;
     }>;
     signInWithPassword(args: { email: string; password: string }): Promise<{
-      data: { session: unknown | null };
+      data: { session: SupabaseSessionLike | null };
       error: { message: string } | null;
     }>;
     signOut(): Promise<unknown>;
     signInWithOAuth(args: { provider: string; options?: Record<string, unknown> }): Promise<{ error: { message: string } | null }>;
     exchangeCodeForSession(code: string): Promise<{ error: { message: string } | null }>;
+    verifyOtp(args: { token_hash: string; type: string }): Promise<{ error: { message: string } | null }>;
     setSession(args: { access_token: string; refresh_token: string }): Promise<{ error: { message: string } | null }>;
     updateUser(args: { data: Record<string, unknown> }): Promise<{ error: { message: string } | null }>;
   };
@@ -32,7 +49,14 @@ type SupabaseLike = {
 let pending: Promise<SupabaseLike> | null = null;
 
 export function getSupabase(): Promise<SupabaseLike> {
-  if (!pending) pending = create();
+  if (!pending) {
+    // A transient import/network failure should not poison the client for the rest
+    // of the tab. A later auth attempt can retry the lazy initialization.
+    pending = create().catch((error) => {
+      pending = null;
+      throw error;
+    });
+  }
   return pending;
 }
 
@@ -40,12 +64,12 @@ async function create(): Promise<SupabaseLike> {
   const url = import.meta.env.VITE_SUPABASE_URL as string;
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
   const mod = await import('@supabase/supabase-js');
-  // Explicit rather than relying on defaults: detectSessionInUrl is what turns the
-  // ?code= on the OAuth return into a session, and pkce is the flow Supabase issues.
-  // If either is wrong the redirect lands silently signed-out.
+  // AuthContext owns callback parsing so it can report provider failures and clean
+  // every auth parameter. Leaving automatic URL detection on would make Supabase
+  // race the explicit PKCE exchange and turn a useful error into a silent redirect.
   return mod.createClient(url, key, {
     auth: {
-      detectSessionInUrl: true,
+      detectSessionInUrl: false,
       flowType: 'pkce',
       persistSession: true,
       autoRefreshToken: true,

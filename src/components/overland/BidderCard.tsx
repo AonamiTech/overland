@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { currentAuthReturnTo } from '@/auth/authIntent';
 import Stars from './Stars';
 import { carrierLinks } from '@/lib/carrier';
 
@@ -64,7 +65,7 @@ export default function BidderCard({ info, onOpenProfile, onReport }: { info: Bi
         </p>
         <button
           type="button"
-          onClick={() => openAuth('shipper')}
+          onClick={() => openAuth({ mode: 'signin', role: 'shipper', returnTo: currentAuthReturnTo() })}
           className="mt-1.5 text-[12px] underline underline-offset-2"
           style={{ fontFamily: 'Poppins, sans-serif', color: ACCENT }}
         >

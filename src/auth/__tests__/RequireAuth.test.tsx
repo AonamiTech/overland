@@ -92,6 +92,7 @@ describe('RequireAuth', () => {
     expect(screen.getByTestId('home')).toBeInTheDocument();
     expect(screen.queryByTestId('protected-content')).toBeNull();
     expect(openAuthMock).toHaveBeenCalledTimes(1);
+    expect(openAuthMock).toHaveBeenCalledWith({ mode: 'signin', returnTo: '/board' });
   });
 
   it('renders children when loading is resolved and user is authenticated', () => {

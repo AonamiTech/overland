@@ -83,7 +83,7 @@ export default function HeroReel() {
         <div className="mt-9 flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => (user ? navigate('/board') : openAuth('shipper'))}
+            onClick={() => (user ? navigate('/board') : openAuth({ mode: 'signup', role: 'shipper', returnTo: '/board' }))}
             className="aon-cta aon-cta--dark"
           >
             Open the board

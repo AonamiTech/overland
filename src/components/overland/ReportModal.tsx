@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { currentAuthReturnTo } from '@/auth/authIntent';
 import { reportContent } from '@/lib/db';
 
 const ACCENT = '#1E4D6B';
@@ -29,7 +30,11 @@ export default function ReportModal({
             Reporting suspicious freight or capacity requires a member account.
           </p>
           <div className="mt-6 flex justify-center gap-3">
-            <button type="button" onClick={() => { onClose(); openAuth(); }} className="aon-cta aon-cta--dark">
+            <button
+              type="button"
+              onClick={() => { onClose(); openAuth({ mode: 'signin', returnTo: currentAuthReturnTo() }); }}
+              className="aon-cta aon-cta--dark"
+            >
               Sign in
             </button>
             <button type="button" onClick={onClose} className="aon-cta aon-cta--ghost">

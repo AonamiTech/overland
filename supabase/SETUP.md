@@ -132,7 +132,29 @@ When `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are blank in `.env.local`,
 
 ---
 
-## 6. RLS Integration Test Suite (Dedicated Test Project)
+## 6. Google sign-in and callback URLs
+
+Email/password and magic-link auth work without Google. To enable the optional Google
+button:
+
+1. In Supabase Dashboard → **Authentication → Providers → Google**, enable Google and
+   copy the provider callback URL shown there.
+2. In Google Cloud Console, add that exact Supabase callback URL as an **Authorized
+   redirect URI** for the OAuth web client. Add the deployed app origin and local app
+   origin as authorized JavaScript origins if Google requests them.
+3. Copy the same OAuth client ID and client secret into the Supabase Google provider.
+   A secret mismatch causes the return exchange to fail; it cannot be repaired from
+   browser code.
+4. In Supabase **Authentication → URL Configuration**, allow the deployed app root and
+   `http://localhost:8080/` as redirect URLs. Overland adds a same-origin return-path
+   query parameter to that root callback so a visitor returns to the page that opened
+   sign-in.
+
+Set `VITE_GOOGLE_AUTH=off` while the provider is incomplete. A failed exchange is
+reported in the app and the Google button is suppressed on that browser until a later
+successful session clears the marker.
+
+## 7. RLS Integration Test Suite (Dedicated Test Project)
 
 The static SQL tests run automatically during `npm test`. To execute the full 8-scenario RLS integration test harness, configure environment variables for a dedicated Supabase test project:
 
@@ -145,5 +167,4 @@ export SUPABASE_TEST_USER2_EMAIL="user2@test.com"
 export SUPABASE_TEST_USER2_PASS="password123"
 ```
 When these variables are absent, the 8 integration tests skip gracefully to avoid modifying production data or failing without credentials.
-
 

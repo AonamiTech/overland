@@ -40,7 +40,7 @@ export default function HeroDirect() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => (user ? nav('/board') : openAuth('shipper'))}
+                onClick={() => (user ? nav('/board') : openAuth({ mode: 'signup', role: 'shipper', returnTo: '/board' }))}
                 className="aon-cta aon-cta--dark"
               >
                 {user ? 'Go to the board' : 'Sign up free'}

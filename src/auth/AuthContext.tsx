@@ -1,268 +1,310 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { events } from '@/lib/analytics';
-
-/**
- * Email-only auth for the Overland board.
- *
- * The product's whole verification promise is "we check the email is real, nothing
- * else" - so there are no passwords here by design. You enter an email, you get a
- * link, you click it, you are on the board. Everything past that (authority,
- * insurance, whether the other party is who they say) is explicitly the user's job.
- *
- * TWO BACKENDS behind one interface:
- *
- *  - supabase  : real magic-link email. Used when VITE_SUPABASE_URL and
- *                VITE_SUPABASE_ANON_KEY are set. This is what ships.
- *  - local     : localStorage only, NO EMAIL IS SENT. Used when the keys are absent
- *                so the app still runs for development. The UI must say so out loud -
- *                a "check your inbox" screen that never sends is worse than no auth.
- *
- * `mode` is exported so the UI can be honest about which one is live.
- */
+import {
+  AUTH_ROLE_PARAM,
+  AUTH_RETURN_PARAM,
+  DEFAULT_AUTH_RETURN_TO,
+  authCallbackUrl,
+  readAuthIntent,
+  readAuthIntentRole,
+  saveAuthIntent,
+  clearAuthIntent,
+} from './authIntent';
+import {
+  clearLocalSession,
+  createLocalUser,
+  readLocalAccount,
+  readLocalSession,
+  saveLocalAccount,
+  writeLocalSession,
+} from './localStore';
+import type { SupabaseSessionLike } from './supabaseClient';
 
 export type Role = 'shipper' | 'carrier';
-/** Shown next to every listing - it changes who you think you are dealing with. */
 export type AccountType = 'individual' | 'company';
+export type AuthMode = 'supabase' | 'local';
+export type AuthView = 'signin' | 'signup';
+
+export type AuthOpenOptions = {
+  mode?: AuthView;
+  role?: Role;
+  /** Same-origin path/query/hash to visit after authentication. */
+  returnTo?: string;
+};
+
+/** The string overload keeps older integrations working while callers migrate. */
+type AuthOpenInput = AuthOpenOptions | Role;
 
 export type User = {
   id: string;
   email: string;
   role: Role;
   accountType: AccountType;
-  /** Shown to a counterparty once a bid is accepted - the introduction is the
-   *  product, so these are collected up front rather than chased later. */
   name: string;
   phone: string;
   city: string;
   orgName?: string;
-  /** Carriers only. Self-declared, never checked by us - shown so counterparties
-   *  can look it up on the FMCSA register themselves. */
   mcNumber?: string;
   usdotNumber?: string;
   createdAt: string;
 };
 
-export type AuthMode = 'supabase' | 'local';
-
-/* Flat rather than a discriminated union: the union does not narrow reliably
-   through the useMemo-typed context, and the call site is one branch anyway. */
 export type SendResult = { ok: boolean; emailed?: boolean; error?: string };
 
 /** Profile fields collected at signup and written to user_metadata. */
 export type SignUpExtra = {
-  name?: string; phone?: string; city?: string;
-  accountType?: AccountType; orgName?: string;
-  mcNumber?: string; usdotNumber?: string;
+  name?: string;
+  phone?: string;
+  city?: string;
+  accountType?: AccountType;
+  orgName?: string;
+  mcNumber?: string;
+  usdotNumber?: string;
 };
 
 type AuthValue = {
   user: User | null;
   loading: boolean;
   mode: AuthMode;
-  /** Set when session restore or an OAuth callback failed. Shown to the user. */
   authError: string | null;
-  /** Create an account with a password. May or may not sign you in - see the result. */
   signUpWithPassword(email: string, password: string, role: Role, extra?: SignUpExtra): Promise<SendResult>;
   signInWithPassword(email: string, password: string): Promise<SendResult>;
-  /** Sends a magic link (supabase) or signs in immediately (local). */
-  sendLink(email: string, role: Role, extra?: SignUpExtra): Promise<SendResult>;
-  /** Patch the signed-in user's own profile. Signup metadata is only applied when the
-   *  user row is first created, so anything set later must go through here. */
+  /** Sends a magic link, or signs in immediately in local demo mode. */
+  sendLink(email: string, role: Role, extra?: SignUpExtra, intent?: AuthView): Promise<SendResult>;
   updateProfile(patch: Partial<Omit<User, 'id' | 'email' | 'createdAt'>>): Promise<{ ok: boolean; error?: string }>;
-  /** Google OAuth. Sends no email, so it is unaffected by the magic-link rate limit -
-   *  and it is the lower-friction path for most people. */
-  signInWithGoogle(): Promise<{ ok: boolean; error?: string }>;
+  signInWithGoogle(role?: Role): Promise<{ ok: boolean; error?: string }>;
   signOut(): Promise<void>;
-  /** Opens the auth modal. `role` preselects the tab. */
-  openAuth(role?: Role): void;
+  openAuth(input?: AuthOpenInput): void;
   closeAuth(): void;
   authOpen: boolean;
   pendingRole: Role;
+  /** Optional for compatibility with consumers that mock the auth context. */
+  pendingAuthMode?: AuthView;
 };
-
-const STORAGE_KEY = 'overland.session.v1';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 export const AUTH_MODE: AuthMode = SUPABASE_URL && SUPABASE_KEY ? 'supabase' : 'local';
 
-/**
- * Clear stale PKCE code verifiers before starting a new OAuth flow.
- *
- * supabase-js writes a verifier per flow. An abandoned attempt - the user closes the
- * Google tab, or the redirect never lands - leaves its verifier behind forever, and
- * they accumulate across retries. On return the exchange then has to pick one out of a
- * pile of stale entries, fails, and the whole thing dies silently with the user simply
- * still signed out. Starting a flow means any earlier one is dead, so drop them.
- */
-/** Build and persist the local-mode user. Shared by the magic-link and password paths
- *  so neither has to reach for `this`, which breaks the moment the context is
- *  destructured - which every consumer does. */
-function makeLocalUser(email: string, role: Role, extra?: SignUpExtra): User {
-  const u: User = {
-    id: `local-${email}`,
-    email,
-    role,
-    accountType: extra?.accountType ?? 'individual',
-    name: extra?.name ?? '',
-    phone: extra?.phone ?? '',
-    city: extra?.city ?? '',
-    orgName: extra?.orgName,
-    mcNumber: extra?.mcNumber,
-    usdotNumber: extra?.usdotNumber,
-    createdAt: new Date().toISOString(),
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-  return u;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const AUTH_QUERY_PARAMS = [
+  'code',
+  'error',
+  'error_code',
+  'error_description',
+  'error_reason',
+  'error_uri',
+  'token_hash',
+  'type',
+  AUTH_RETURN_PARAM,
+  AUTH_ROLE_PARAM,
+];
+
+function cleanEmail(email: string): string {
+  return email.trim().toLowerCase();
 }
 
-function clearStaleVerifiers() {
+function clearGoogleFailureMarker(): void {
+  try { localStorage.removeItem('overland.google_broken'); } catch { /* storage unavailable */ }
+}
+
+function sessionUser(session: SupabaseSessionLike | null, fallbackRole?: Role): User | null {
+  const source = session?.user;
+  if (!source) return null;
+
+  const metadata = (source.user_metadata ?? {}) as Record<string, unknown>;
+  const role: Role = metadata.role === 'carrier'
+    ? 'carrier'
+    : metadata.role === 'shipper'
+      ? 'shipper'
+      : fallbackRole ?? 'shipper';
+  const accountType: AccountType = metadata.accountType === 'company' ? 'company' : 'individual';
+  const stringValue = (key: string): string | undefined => {
+    const value = metadata[key];
+    return typeof value === 'string' ? value : undefined;
+  };
+
+  return {
+    id: source.id,
+    email: source.email ?? '',
+    role,
+    accountType,
+    name: stringValue('name') ?? '',
+    phone: stringValue('phone') ?? '',
+    city: stringValue('city') ?? '',
+    orgName: stringValue('orgName'),
+    mcNumber: stringValue('mcNumber'),
+    usdotNumber: stringValue('usdotNumber'),
+    createdAt: source.created_at ?? new Date().toISOString(),
+  };
+}
+
+function removeAuthParams(clearHash: boolean): void {
   try {
-    for (const k of Object.keys(localStorage)) {
-      if (k.startsWith('sb-') && k.includes('code-verifier')) localStorage.removeItem(k);
+    const clean = new URL(window.location.href);
+    AUTH_QUERY_PARAMS.forEach((key) => clean.searchParams.delete(key));
+    if (clearHash) {
+      clean.hash = '';
+    } else if (clean.hash) {
+      const parts = clean.hash.slice(1).split('&');
+      const retained = parts.filter((part) => {
+        const rawKey = part.split('=', 1)[0].replace(/\+/g, ' ');
+        let key = rawKey;
+        try { key = decodeURIComponent(rawKey); } catch { /* keep the raw key */ }
+        return !AUTH_QUERY_PARAMS.includes(key);
+      });
+      if (retained.length !== parts.length) clean.hash = retained.length ? `#${retained.join('&')}` : '';
     }
+    window.history.replaceState({}, '', `${clean.pathname}${clean.search}${clean.hash}`);
   } catch {
-    /* storage unavailable (private mode, blocked cookies) - the flow can still work */
+    // A malformed callback should not prevent the provider from restoring a session.
   }
+}
+
+function decodeCallbackError(value: string): string {
+  try { return decodeURIComponent(value.replace(/\+/g, ' ')); } catch { return value; }
+}
+
+function disposeSubscription(subscription: unknown): void {
+  const candidate = subscription as {
+    data?: { subscription?: { unsubscribe?: () => void } };
+    unsubscribe?: () => void;
+  } | null;
+  candidate?.data?.subscription?.unsubscribe?.();
+  candidate?.unsubscribe?.();
 }
 
 const Ctx = createContext<AuthValue | null>(null);
-
-function readStored(): User | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as User) : null;
-  } catch {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authOpen, setAuthOpen] = useState(false);
   const [pendingRole, setPendingRole] = useState<Role>('shipper');
+  const [pendingAuthMode, setPendingAuthMode] = useState<AuthView>('signin');
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Restore session before anything renders a guarded route, so an authenticated
-  // user never sees a flash of the signed-out state.
   useEffect(() => {
     let cancelled = false;
+    let subscription: unknown;
 
-    (async () => {
-      if (AUTH_MODE === 'supabase') {
-        try {
-          const { getSupabase } = await import('./supabaseClient');
-          const sb = await getSupabase();
-
-          /* Email links - confirmation, magic link, recovery - come back on the
-             implicit flow: the tokens arrive in the URL *fragment*, not as a ?code=.
-             flowType:'pkce' is right for the Google button but makes the client look
-             only for a code, so those links landed on a signed-out page with a valid
-             session sitting unread in the address bar. Handle the hash ourselves. */
-          const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-          const access_token = hash.get('access_token');
-          const refresh_token = hash.get('refresh_token');
-          if (access_token && refresh_token) {
-            const { error } = await sb.auth.setSession({ access_token, refresh_token });
-            if (error && !cancelled) setAuthError(`Could not finish signing you in: ${error.message}`);
-            // Strip the tokens so they are not left in history or a shared URL.
-            window.history.replaceState({}, '', window.location.pathname + window.location.search);
-          }
-
-          /* A failed provider hand-off comes back as ?error=...&error_description=...
-             in the QUERY STRING, while an expired or reused link puts the same fields
-             in the FRAGMENT. Only the fragment was being read, so the whole class of
-             "Google could not be exchanged" failures landed on a silent signed-out
-             page - the single worst outcome, because there is nothing to react to. */
-          const search = new URLSearchParams(window.location.search);
-          const oauthError = search.get('error_description') || hash.get('error_description');
-          const oauthCode = search.get('error_code') || hash.get('error_code');
-          if (oauthError) {
-            const plain = decodeURIComponent(oauthError.replace(/\+/g, ' '));
-            if (!cancelled) {
-              // "Unable to exchange external code" is Supabase telling us its own
-              // credentials for the provider are wrong. Nothing the visitor can do
-              // about it, so say who has to fix it rather than blaming their attempt.
-              const providerBroken = /unable to exchange external code|unsupported provider|provider is not enabled/i.test(plain);
-              if (providerBroken) {
-                /* Supabase could not trade Google's code for tokens — its provider
-                   credentials are wrong. The visitor cannot fix that and should not be
-                   offered the button again on this device until it works. */
-                try { localStorage.setItem('overland.google_broken', '1'); } catch { /* private mode */ }
-              }
-              setAuthError(
-                providerBroken
-                  ? 'Google sign-in is temporarily unavailable. Use your email and password — it takes a moment and works the same.'
-                  : plain,
-              );
-            }
-            events.authFailed(oauthCode ?? 'oauth_error', plain);
-            window.history.replaceState({}, '', window.location.pathname);
-          }
-
-          // detectSessionInUrl normally handles this, but doing it explicitly means an
-          // OAuth failure produces a message rather than a shrug.
-          const code = new URLSearchParams(window.location.search).get('code');
-          if (code) {
-            const { error } = await sb.auth.exchangeCodeForSession(code);
-            if (error && !/both auth code and code verifier|already/i.test(error.message)) {
-              if (!cancelled) setAuthError(`Google sign-in did not complete: ${error.message}`);
-            }
-            // Clear the code either way so a refresh does not retry a spent one.
-            const clean = new URL(window.location.href);
-            clean.searchParams.delete('code');
-            window.history.replaceState({}, '', clean.pathname + clean.search + clean.hash);
-          }
-
-          const { data } = await sb.auth.getSession();
-          const s = data.session;
-          if (s?.user) {
-            // A working round trip clears the flag, so fixing the provider needs no redeploy.
-            try { localStorage.removeItem('overland.google_broken'); } catch { /* ignore */ }
-          }
-          if (!cancelled && s?.user) {
-            const m = (s.user.user_metadata ?? {}) as Record<string, string>;
-            setUser({
-              id: s.user.id,
-              email: s.user.email ?? '',
-              role: (m.role as Role) ?? 'shipper',
-              accountType: (m.accountType as AccountType) ?? 'individual',
-              name: m.name ?? '', phone: m.phone ?? '', city: m.city ?? '',
-              orgName: m.orgName,
-              mcNumber: m.mcNumber,
-              usdotNumber: m.usdotNumber,
-              createdAt: s.user.created_at ?? new Date().toISOString(),
-            });
-          }
-          sb.auth.onAuthStateChange((_e, session) => {
-            if (!session?.user) return setUser(null);
-            const m = (session.user.user_metadata ?? {}) as Record<string, string>;
-            setUser({
-              id: session.user.id,
-              email: session.user.email ?? '',
-              role: (m.role as Role) ?? 'shipper',
-              accountType: (m.accountType as AccountType) ?? 'individual',
-              name: m.name ?? '', phone: m.phone ?? '', city: m.city ?? '',
-              orgName: m.orgName,
-              mcNumber: m.mcNumber,
-              usdotNumber: m.usdotNumber,
-              createdAt: session.user.created_at ?? new Date().toISOString(),
-            });
-          });
-        } catch (e) {
-          // Never swallow this. A silent failure here looks identical to "nothing
-          // happened" from the user's side, which is the worst possible outcome
-          // immediately after they came back from Google.
-          if (!cancelled) setAuthError(e instanceof Error ? e.message : 'Could not restore your session.');
-        }
-      } else if (!cancelled) {
-        setUser(readStored());
+    const restore = async () => {
+      if (AUTH_MODE !== 'supabase') {
+        const stored = readLocalSession();
+        if (!cancelled) setUser(stored);
+        if (!cancelled) setLoading(false);
+        return;
       }
-      if (!cancelled) setLoading(false);
-    })();
 
-    return () => { cancelled = true; };
+      try {
+        const { getSupabase } = await import('./supabaseClient');
+        const sb = await getSupabase();
+
+        // Listen once for password, magic-link and OAuth sessions. The cleanup is
+        // important in development StrictMode and when the app hot-reloads.
+        subscription = sb.auth.onAuthStateChange((_event, session) => {
+          if (cancelled) return;
+          const next = sessionUser(session, readAuthIntentRole() ?? undefined);
+          setUser(next);
+          if (next) {
+            clearGoogleFailureMarker();
+            setAuthError(null);
+          }
+        });
+        if (cancelled) disposeSubscription(subscription);
+
+        const url = new URL(window.location.href);
+        const search = url.searchParams;
+        const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
+        const accessToken = hash.get('access_token');
+        const refreshToken = hash.get('refresh_token');
+        const tokenHash = search.get('token_hash') || hash.get('token_hash');
+        const callbackType = search.get('type') || hash.get('type') || 'email';
+        const callbackTarget = search.get(AUTH_RETURN_PARAM) || hash.get(AUTH_RETURN_PARAM);
+        const callbackRoleValue = search.get(AUTH_ROLE_PARAM) || hash.get(AUTH_ROLE_PARAM);
+        const callbackRole: Role | undefined = callbackRoleValue === 'carrier' || callbackRoleValue === 'shipper'
+          ? callbackRoleValue
+          : undefined;
+        if (callbackTarget || callbackRole) saveAuthIntent(callbackTarget ?? DEFAULT_AUTH_RETURN_TO, callbackRole);
+
+        let hadAuthHash = Boolean(accessToken || refreshToken || tokenHash || hash.get('error') || hash.get('error_description'));
+        if (accessToken && refreshToken) {
+          const { error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          if (error && !cancelled) {
+            setAuthError(`Could not finish signing you in: ${error.message}`);
+            events.authFailed('implicit_session', error.message);
+          }
+        }
+
+        const callbackErrorValue = search.get('error_description')
+          || hash.get('error_description')
+          || search.get('error')
+          || hash.get('error');
+        if (callbackErrorValue) {
+          const plain = decodeCallbackError(callbackErrorValue);
+          const providerBroken = /unable to exchange external code|unsupported provider|provider is not enabled/i.test(plain);
+          if (providerBroken) {
+            try { localStorage.setItem('overland.google_broken', '1'); } catch { /* private mode */ }
+          }
+          if (!cancelled) {
+            setAuthError(
+              providerBroken
+                ? 'Google sign-in is temporarily unavailable. Use your email and password — it takes a moment and works the same.'
+                : plain,
+            );
+          }
+          events.authFailed(search.get('error_code') || hash.get('error_code') || 'oauth_error', plain);
+          hadAuthHash = true;
+        }
+
+        if (tokenHash && !callbackErrorValue) {
+          const { error } = await sb.auth.verifyOtp({ token_hash: tokenHash, type: callbackType });
+          if (error && !cancelled) {
+            setAuthError(`The sign-in link could not be verified: ${error.message}`);
+            events.authFailed('magic_link_verification', error.message);
+          }
+        }
+
+        const code = search.get('code');
+        if (code) {
+          const { error } = await sb.auth.exchangeCodeForSession(code);
+          if (error && !cancelled) {
+            setAuthError(`Google sign-in did not complete: ${error.message}`);
+            events.authFailed('oauth_code_exchange', error.message);
+          }
+        }
+
+        // Supabase's URL detector is disabled in supabaseClient.ts so this explicit
+        // path is the only code exchange. It lets us surface failures and guarantees
+        // auth tokens/codes do not remain in browser history.
+        if (code || callbackTarget || callbackErrorValue || hadAuthHash) {
+          removeAuthParams(hadAuthHash);
+        }
+
+        const { data, error: sessionError } = await sb.auth.getSession();
+        if (sessionError && !cancelled) setAuthError(`Could not restore your session: ${sessionError.message}`);
+        const restored = sessionUser(data.session, readAuthIntentRole() ?? callbackRole);
+        if (restored) {
+          clearGoogleFailureMarker();
+          if (!cancelled) {
+            setUser(restored);
+            setAuthError(null);
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAuthError(error instanceof Error ? error.message : 'Could not restore your session.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    void restore();
+    return () => {
+      cancelled = true;
+      disposeSubscription(subscription);
+    };
   }, []);
 
   const value = useMemo<AuthValue>(() => ({
@@ -271,21 +313,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     mode: AUTH_MODE,
     authOpen,
     pendingRole,
+    pendingAuthMode,
     authError,
-    openAuth: (role) => { if (role) setPendingRole(role); setAuthOpen(true); },
+
+    openAuth: (input) => {
+      const legacy = typeof input === 'string';
+      const options: AuthOpenOptions = legacy ? { role: input, mode: 'signup' } : (input ?? {});
+      if (options.role) setPendingRole(options.role);
+      setPendingAuthMode(options.mode ?? 'signin');
+      saveAuthIntent(options.returnTo ?? DEFAULT_AUTH_RETURN_TO, options.role);
+      setAuthError(null);
+      setAuthOpen(true);
+    },
     closeAuth: () => setAuthOpen(false),
 
     async signUpWithPassword(email, password, role, extra) {
-      const clean = email.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(clean)) {
-        return { ok: false, error: 'That does not look like an email address.' };
-      }
+      const clean = cleanEmail(email);
+      if (!EMAIL_RE.test(clean)) return { ok: false, error: 'That does not look like an email address.' };
       if (password.length < 8) return { ok: false, error: 'Use at least 8 characters.' };
 
-      if (AUTH_MODE !== 'supabase') {
-        // Local mode has no server to hash against, so the password is not persisted -
-        // it would be plaintext in localStorage, which is worse than not having it.
-        setUser(makeLocalUser(clean, role, extra));
+      if (AUTH_MODE === 'local') {
+        if (readLocalAccount(clean)) return { ok: false, error: 'That email already has an account. Sign in instead.' };
+        const localUser = createLocalUser(clean, role, extra);
+        saveLocalAccount(localUser);
+        writeLocalSession(localUser);
+        setUser(localUser);
+        setAuthError(null);
         return { ok: true, emailed: false };
       }
 
@@ -296,13 +349,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: clean,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: authCallbackUrl(),
             data: {
               role,
               accountType: extra?.accountType ?? 'individual',
-              name: extra?.name, phone: extra?.phone, city: extra?.city,
+              name: extra?.name,
+              phone: extra?.phone,
+              city: extra?.city,
               orgName: extra?.orgName,
-              mcNumber: extra?.mcNumber, usdotNumber: extra?.usdotNumber,
+              mcNumber: extra?.mcNumber,
+              usdotNumber: extra?.usdotNumber,
             },
           },
         });
@@ -310,10 +366,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const exists = /already registered|already exists|user already/i.test(error.message);
           return { ok: false, error: exists ? 'That email already has an account. Sign in instead.' : error.message };
         }
-        // With "Confirm email" on, signUp returns a user but no session - the account
-        // exists and is unusable until the link is clicked. Distinguishing the two is
-        // the difference between "you are in" and "go check your inbox".
-        if (data.session) return { ok: true, emailed: false };
+        const signedIn = sessionUser(data.session, role);
+        if (signedIn) {
+          clearGoogleFailureMarker();
+          setUser(signedIn);
+          setAuthError(null);
+          return { ok: true, emailed: false };
+        }
         return { ok: true, emailed: true };
       } catch {
         return { ok: false, error: 'Could not reach the sign-up service. Try again.' };
@@ -321,35 +380,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
 
     async signInWithPassword(email, password) {
-      const clean = email.trim().toLowerCase();
-      if (AUTH_MODE !== 'supabase') return { ok: false, error: 'Password sign-in needs Supabase keys.' };
+      const clean = cleanEmail(email);
+      if (!EMAIL_RE.test(clean)) return { ok: false, error: 'That does not look like an email address.' };
+      if (!password) return { ok: false, error: 'Enter your password.' };
+
+      if (AUTH_MODE === 'local') {
+        const localUser = readLocalAccount(clean);
+        if (!localUser) {
+          return { ok: false, error: 'No local account found for that email. Create an account first.' };
+        }
+        // Local mode never stores passwords. The UI explains that this is a demo
+        // session, while a real Supabase deployment verifies the password server-side.
+        writeLocalSession(localUser);
+        setUser(localUser);
+        setAuthError(null);
+        return { ok: true, emailed: false };
+      }
+
       try {
         const { getSupabase } = await import('./supabaseClient');
         const sb = await getSupabase();
         const { data, error } = await sb.auth.signInWithPassword({ email: clean, password });
         if (error) {
-          // Never say which half was wrong: that turns the form into a way to test
-          // whether a given email has an account here.
           const bad = /invalid login credentials/i.test(error.message);
           const unconfirmed = /email not confirmed/i.test(error.message);
           return {
             ok: false,
-            error: unconfirmed ? 'Confirm your email first - check your inbox for the link.'
-                 : bad ? 'That email and password do not match.'
-                 : error.message,
+            error: unconfirmed
+              ? 'Confirm your email first — check your inbox for the link.'
+              : bad
+                ? 'That email and password do not match.'
+                : error.message,
           };
         }
-        return { ok: Boolean(data.session), error: data.session ? undefined : 'Could not start a session.' };
+        const signedIn = sessionUser(data.session);
+        if (!signedIn) return { ok: false, error: 'Could not start a session.' };
+        clearGoogleFailureMarker();
+        setUser(signedIn);
+        setAuthError(null);
+        return { ok: true, emailed: false };
       } catch {
         return { ok: false, error: 'Could not reach the sign-in service. Try again.' };
       }
     },
 
-    async sendLink(email, role, extra) {
-      const clean = email.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(clean)) {
-        return { ok: false, error: 'That does not look like an email address.' };
-      }
+    async sendLink(email, role, extra, intent = 'signup') {
+      const clean = cleanEmail(email);
+      if (!EMAIL_RE.test(clean)) return { ok: false, error: 'That does not look like an email address.' };
 
       if (AUTH_MODE === 'supabase') {
         try {
@@ -358,14 +435,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const { error } = await sb.auth.signInWithOtp({
             email: clean,
             options: {
-              emailRedirectTo: `${window.location.origin}/`,
-              data: {
-                role,
-                accountType: extra?.accountType ?? 'individual',
-                name: extra?.name, phone: extra?.phone, city: extra?.city,
-                orgName: extra?.orgName,
-                mcNumber: extra?.mcNumber, usdotNumber: extra?.usdotNumber,
-              },
+              emailRedirectTo: authCallbackUrl(),
+              // A sign-in link should not silently create an account for a typo.
+              shouldCreateUser: intent !== 'signin',
+              ...(intent === 'signup'
+                ? {
+                    data: {
+                      role,
+                      accountType: extra?.accountType ?? 'individual',
+                      name: extra?.name,
+                      phone: extra?.phone,
+                      city: extra?.city,
+                      orgName: extra?.orgName,
+                      mcNumber: extra?.mcNumber,
+                      usdotNumber: extra?.usdotNumber,
+                    },
+                  }
+                : {}),
             },
           });
           if (error) return { ok: false, error: error.message };
@@ -375,22 +461,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Local mode: no email leaves the browser. Sign in directly and let the UI say so.
-      const u: User = {
-        id: `local-${clean}`,
-        email: clean,
-        role,
-        accountType: extra?.accountType ?? 'individual',
-        name: extra?.name ?? '',
-        phone: extra?.phone ?? '',
-        city: extra?.city ?? '',
-        orgName: extra?.orgName,
-        mcNumber: extra?.mcNumber,
-        usdotNumber: extra?.usdotNumber,
-        createdAt: new Date().toISOString(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-      setUser(u);
+      if (intent === 'signin') {
+        const existing = readLocalAccount(clean);
+        if (!existing) return { ok: false, error: 'No local account found for that email. Create an account first.' };
+        writeLocalSession(existing);
+        setUser(existing);
+        setAuthError(null);
+        return { ok: true, emailed: false };
+      }
+
+      if (readLocalAccount(clean)) return { ok: false, error: 'That email already has an account. Sign in instead.' };
+      const localUser = createLocalUser(clean, role, extra);
+      saveLocalAccount(localUser);
+      writeLocalSession(localUser);
+      setUser(localUser);
+      setAuthError(null);
       return { ok: true, emailed: false };
     },
 
@@ -419,27 +504,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return { ok: false, error: 'Could not save. Try again.' };
         }
       } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        saveLocalAccount(next);
+        writeLocalSession(next);
       }
 
       setUser(next);
       return { ok: true };
     },
 
-    async signInWithGoogle() {
+    async signInWithGoogle(role) {
       if (AUTH_MODE !== 'supabase') return { ok: false, error: 'Google sign-in needs Supabase keys.' };
+      // Normally openAuth has already written this. The fallback makes the method
+      // safe for a custom consumer that invokes it directly.
+      if (!readAuthIntent()) saveAuthIntent(DEFAULT_AUTH_RETURN_TO, role);
+      else if (role) saveAuthIntent(readAuthIntent(), role);
       try {
         const { getSupabase } = await import('./supabaseClient');
         const sb = await getSupabase();
-        clearStaleVerifiers();
+        try {
+          for (const key of Object.keys(localStorage)) {
+            if (key.startsWith('sb-') && key.includes('code-verifier')) localStorage.removeItem(key);
+          }
+        } catch { /* storage unavailable */ }
         const { error } = await sb.auth.signInWithOAuth({
           provider: 'google',
-          options: { redirectTo: `${window.location.origin}/` },
+          options: { redirectTo: authCallbackUrl() },
         });
         if (error) {
-          // "Unsupported provider: provider is not enabled" is a config message aimed at
-          // us, not the person trying to sign in. Say something they can act on.
           const notConfigured = /provider is not enabled|unsupported provider/i.test(error.message);
+          if (notConfigured) {
+            try { localStorage.setItem('overland.google_broken', '1'); } catch { /* private mode */ }
+          }
           return {
             ok: false,
             error: notConfigured
@@ -447,7 +542,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               : error.message,
           };
         }
-        return { ok: true };   // browser navigates away to Google
+        return { ok: true };
       } catch {
         return { ok: false, error: 'Could not reach Google. Try again.' };
       }
@@ -455,20 +550,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async signOut() {
       if (AUTH_MODE === 'supabase') {
-        const { getSupabase } = await import('./supabaseClient');
-        const sb = await getSupabase();
-        await sb.auth.signOut();
+        try {
+          const { getSupabase } = await import('./supabaseClient');
+          const sb = await getSupabase();
+          await sb.auth.signOut();
+        } catch {
+          // Clear the local view even if the remote sign-out request is unavailable.
+        }
       }
-      localStorage.removeItem(STORAGE_KEY);
+      clearLocalSession();
+      clearAuthIntent();
       setUser(null);
     },
-  }), [user, loading, authOpen, pendingRole]);
+  }), [user, loading, authOpen, pendingRole, pendingAuthMode, authError]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
 export function useAuth(): AuthValue {
-  const v = useContext(Ctx);
-  if (!v) throw new Error('useAuth must be used inside <AuthProvider>');
-  return v;
+  const value = useContext(Ctx);
+  if (!value) throw new Error('useAuth must be used inside <AuthProvider>');
+  return value;
 }

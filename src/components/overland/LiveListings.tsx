@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { currentAuthReturnTo } from '@/auth/authIntent';
 import { fetchListings, fetchBids, placeBid, getPublicProfiles, isLive, type Listing, type Bid, type PublicProfile } from '@/lib/db';
 import BidderCard, { BidderDisclaimer } from './BidderCard';
 import { money } from '@/lib/market';
@@ -21,7 +22,7 @@ const DANGER = '#DC2626';
 type Row = Listing & { bids: Bid[]; best: number | null };
 
 export default function LiveListings() {
-  const { user } = useAuth();
+  const { user, openAuth } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -58,6 +59,14 @@ export default function LiveListings() {
     [rows, kind, mineOnly, user?.id],
   );
 
+  const startPosting = () => {
+    if (!user) {
+      openAuth({ mode: 'signup', role: 'shipper', returnTo: currentAuthReturnTo() });
+      return;
+    }
+    setPosting(true);
+  };
+
   const chip = (on: boolean) => ({
     background: on ? INK : 'transparent',
     color: on ? '#FAF9F7' : 'rgba(17,17,17,.55)',
@@ -71,7 +80,7 @@ export default function LiveListings() {
           <span className="aon-eyebrow" style={{ color: ACCENT }}>Posted by people · live</span>
           <h2 className="aon-display mt-2 text-[clamp(24px,3vw,34px)]">Open listings</h2>
         </div>
-        <button type="button" onClick={() => setPosting(true)} className="aon-cta aon-cta--dark">+ Post</button>
+        <button type="button" onClick={startPosting} className="aon-cta aon-cta--dark">+ Post</button>
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -116,7 +125,7 @@ export default function LiveListings() {
               ? 'Post a load or a truck and it appears here with any bids against it.'
               : 'The board is new. Post the first load or truck and it goes live for everyone immediately.'}
           </p>
-          <button type="button" onClick={() => setPosting(true)} className="aon-cta aon-cta--dark mt-6">
+          <button type="button" onClick={startPosting} className="aon-cta aon-cta--dark mt-6">
             Post the first one
           </button>
         </div>
@@ -288,7 +297,11 @@ function BidSheet({ row, onClose, onDone }: { row: Row; onClose: () => void; onD
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) { onClose(); openAuth('carrier'); return; }
+    if (!user) {
+      onClose();
+      openAuth({ mode: 'signin', role: 'carrier', returnTo: currentAuthReturnTo() });
+      return;
+    }
     const n = Number(amount);
     if (!n || n <= 0) { setErr('Enter an amount.'); return; }
     setBusy(true); setErr(null);

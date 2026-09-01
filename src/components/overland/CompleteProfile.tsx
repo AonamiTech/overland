@@ -42,6 +42,15 @@ export default function CompleteProfile() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  // Google can complete the auth round trip after this component first mounted.
+  // Seed the optional completion form from the role/account type carried by the
+  // restored session instead of defaulting a carrier to shipper.
+  useEffect(() => {
+    if (!user) return;
+    setRole(user.role);
+    setAcct(user.accountType);
+  }, [user]);
+
   const incomplete = !!user && (!user.phone || !user.city);
   if (loading || !user || !incomplete || skipped) return null;
 

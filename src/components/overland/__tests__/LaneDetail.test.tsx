@@ -85,7 +85,11 @@ describe('LaneDetail', () => {
 
     // Clicking it opens auth modal and does NOT show contact details
     fireEvent.click(signInAcceptBtns[0]);
-    expect(openAuthMock).toHaveBeenCalledWith('shipper');
+    expect(openAuthMock).toHaveBeenCalledWith({
+      mode: 'signin',
+      role: 'shipper',
+      returnTo: '/lane/mem-chi',
+    });
     expect(screen.queryByText(/Introduced/i)).toBeNull();
     expect(screen.queryByText(/dispatch@/i)).toBeNull();
   });

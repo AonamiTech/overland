@@ -93,7 +93,7 @@ export function AonNav() {
               <AccountMenu />
             </>
           ) : (
-            <button type="button" onClick={() => openAuth('shipper')} className="aon-cta aon-cta--dark">
+            <button type="button" onClick={() => openAuth({ mode: 'signin', role: 'shipper', returnTo: '/board' })} className="aon-cta aon-cta--dark">
               Sign in
             </button>
           )}
@@ -155,10 +155,10 @@ export function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-wrap items-center gap-3">
-          <button type="button" onClick={() => openAuth('shipper')} className="aon-cta aon-cta--dark">Post a load</button>
+          <button type="button" onClick={() => openAuth({ mode: 'signup', role: 'shipper', returnTo: '/board' })} className="aon-cta aon-cta--dark">Post a load</button>
           <button
             type="button"
-            onClick={() => openAuth('carrier')}
+            onClick={() => openAuth({ mode: 'signup', role: 'carrier', returnTo: '/board' })}
             className="aon-cta aon-cta--ghost"
             style={{ background: 'transparent', color: INK, boxShadow: 'inset 0 0 0 1px rgba(17,17,17,.18)' }}
           >

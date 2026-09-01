@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { currentAuthReturnTo } from '@/auth/authIntent';
 import USLaneMap from './USLaneMap';
 import ProfilePanel from './ProfilePanel';
 import Stars from './Stars';
@@ -235,6 +236,10 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
 
   const submitCounter = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      openAuth({ mode: 'signin', role: 'shipper', returnTo: currentAuthReturnTo() });
+      return;
+    }
     const n = Number(amount.replace(/[^\d]/g, ''));
     if (!n) return;
     setOffers((prev) => [
@@ -354,7 +359,9 @@ export default function LaneDetail({ lane, onClose }: { lane: Lane; onClose: () 
                             {!mine && (
                               <button
                                 type="button"
-                                onClick={() => (user ? setAccepted(o) : openAuth('shipper'))}
+                                onClick={() => (user
+                                  ? setAccepted(o)
+                                  : openAuth({ mode: 'signin', role: 'shipper', returnTo: currentAuthReturnTo() }))}
                                 className="aon-eyebrow"
                                 style={{ color: ACCENT }}
                               >

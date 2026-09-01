@@ -32,7 +32,9 @@ export default function BookCards() {
     ready: ['Today', 'Tomorrow', 'Wed', 'Thu', 'Fri', 'Mon'][i],
   }));
 
-  const go = () => (user ? navigate('/board') : openAuth(kind === 'loads' ? 'carrier' : 'shipper'));
+  const go = () => (user
+    ? navigate('/board')
+    : openAuth({ mode: 'signup', role: kind === 'loads' ? 'carrier' : 'shipper', returnTo: '/board' }));
 
   return (
     <section id="book" className="bg-[#FAF9F7] py-20 md:py-28">

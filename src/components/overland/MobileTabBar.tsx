@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
+import { currentAuthReturnTo } from '@/auth/authIntent';
 import { scrollToEl } from '@/lib/scrollTo';
 
 /**
@@ -79,13 +80,18 @@ export default function MobileTabBar({ onPost }: { onPost?: () => void } = {}) {
   const go = (t: typeof TABS[number]) => {
     // Was nav('/board'), which is the tab next to it - so "You" appeared to do nothing.
     if (t.key === 'you') {
-      if (!user) return openAuth('shipper');
+      if (!user) return openAuth({ mode: 'signin', role: 'shipper', returnTo: currentAuthReturnTo() });
       return window.dispatchEvent(new CustomEvent('overland:open-profile'));
     }
-    if (t.key === 'post') { if (!user) return openAuth('shipper'); if (onPost) return onPost(); return nav('/board'); }
+    if (t.key === 'post') {
+      if (!user) return openAuth({ mode: 'signup', role: 'shipper', returnTo: currentAuthReturnTo() });
+      if (onPost) return onPost();
+      return nav('/board');
+    }
     if (t.href.startsWith('/')) return nav(t.href);
     const el = document.querySelector(t.href);
-    el ? scrollToEl(el, { offset: 64 }) : nav('/' + t.href);
+    if (el) scrollToEl(el, { offset: 64 });
+    else nav('/' + t.href);
   };
 
   // No fallback: on a page that is none of these, nothing should look selected.

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { AuthProvider } from "./auth/AuthContext";
+import AuthReturnRedirect from "./auth/AuthReturnRedirect";
 import RouteMeta from "./components/RouteMeta";
 import CompleteProfile from "./components/overland/CompleteProfile";
 import AuthErrorBanner from "./components/overland/AuthErrorBanner";
@@ -33,6 +34,7 @@ const App = () => (
         <AuthProvider>
           <BrowserRouter>
             <AuthDialog />
+            <AuthReturnRedirect />
             <AuthErrorBanner />
             <CompleteProfile />
             <RouteMeta />

@@ -76,8 +76,9 @@ npm run dev          # http://localhost:8080
 ```
 
 With no environment variables the app runs in **local mode**: nothing is sent, no
-email leaves the browser, and sign-in completes immediately against
-`localStorage`. That is the fastest way to click through the product.
+email leaves the browser, and sign-up/sign-in completes immediately against a
+device-local account registry. Local mode never stores a password; it is a demo
+fallback, not account security. That is the fastest way to click through the product.
 
 To run against a real backend, create `.env` from the example:
 
@@ -90,6 +91,18 @@ cp .env.example .env
 | `VITE_SUPABASE_URL` | for live mode | Both must be set, or the app falls back to local mode |
 | `VITE_SUPABASE_ANON_KEY` | for live mode | Public by design and safe in the bundle. The `service_role` key must **never** appear in this repo or in client code |
 | `VITE_GOOGLE_AUTH` | no | Set to `off` to hide the Google button while its provider credentials are being fixed |
+
+The header **Sign in** action opens the sign-in form directly. Posting actions open
+sign-up, and every auth entry point remembers the page that requested access. Password
+and magic-link sessions return there after authentication; a Google or email callback
+also carries the return target through the full-page redirect. The callback target is
+restricted to an app-local path.
+
+Google is optional and requires the provider to be enabled in Supabase Authentication
+with a matching Google Cloud OAuth client secret. If the provider returns a credential
+exchange error, the app explains that the owner must fix the Supabase/Google Cloud
+configuration and keeps email sign-in available. `VITE_GOOGLE_AUTH=off` hides the
+button during that setup.
 
 Then apply the migrations in `supabase/migrations/` in order. See
 [supabase/SETUP.md](supabase/SETUP.md).

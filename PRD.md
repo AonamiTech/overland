@@ -378,6 +378,29 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
 
+### 1 Sep 2026 — sign-in flow repair
+
+Repaired the existing auth surface rather than adding a second login page. The header
+now opens an explicit sign-in view; posting actions open signup, and the form has a
+clear toggle between the two. Sign-in asks only for email plus password or a one-time
+link, while signup retains the role and profile fields needed by the board.
+
+All entry points now persist a same-origin return path. Password auth navigates back
+immediately; Google, magic-link and email-confirmation callbacks carry the target in
+session storage and a callback query parameter, exchange PKCE codes exactly once,
+remove auth material from the URL, and clean up the Supabase auth listener.
+
+Local mode now keeps a non-secret account/profile registry separate from the active
+session. It never stores a password, signs existing demo accounts back in by email,
+and rejects unknown emails instead of silently creating a new account. Supabase
+password signup/sign-in map returned sessions immediately, so the UI does not depend
+on an eventual auth event.
+
+Credential-free tests cover the modal states, callback variants, intent validation,
+local re-login storage, immediate Supabase session mapping and Google failure copy.
+Google still requires the owner to align the Supabase provider secret with Google
+Cloud; that external configuration is documented in `supabase/SETUP.md`.
+
 ### 1 Sep 2026 — Work Order 4 live marketplace loop & copy alignment
 
 Completed all tasks from `ANTIGRAVITY-TASK-4.md`:

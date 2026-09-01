@@ -46,7 +46,11 @@ describe('BidderCard', () => {
     expect(signInBtn).toBeInTheDocument();
 
     fireEvent.click(signInBtn);
-    expect(openAuthMock).toHaveBeenCalledWith('shipper');
+    expect(openAuthMock).toHaveBeenCalledWith({
+      mode: 'signin',
+      role: 'shipper',
+      returnTo: '/board',
+    });
 
     expect(screen.queryByText(/DOT 3902118/i)).toBeNull();
     expect(screen.queryByText(/FMCSA SAFER/i)).toBeNull();
