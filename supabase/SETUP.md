@@ -130,4 +130,20 @@ In your DNS provider for `overland.com`, add:
 ### 3. Local Mode Fallback
 When `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are blank in `.env.local`, Overland runs in local mode: authentication is immediate via `localStorage` and no emails are sent.
 
+---
+
+## 6. RLS Integration Test Suite (Dedicated Test Project)
+
+The static SQL tests run automatically during `npm test`. To execute the full 8-scenario RLS integration test harness, configure environment variables for a dedicated Supabase test project:
+
+```bash
+export SUPABASE_TEST_URL="https://your-test-project.supabase.co"
+export SUPABASE_TEST_ANON_KEY="your-test-anon-key"
+export SUPABASE_TEST_USER1_EMAIL="user1@test.com"
+export SUPABASE_TEST_USER1_PASS="password123"
+export SUPABASE_TEST_USER2_EMAIL="user2@test.com"
+export SUPABASE_TEST_USER2_PASS="password123"
+```
+When these variables are absent, the 8 integration tests skip gracefully to avoid modifying production data or failing without credentials.
+
 
