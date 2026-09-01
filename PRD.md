@@ -36,7 +36,7 @@ resulting price history is public.
 **Product thesis.** The board is not the business. It is the mechanism that
 generates an open, transaction-level record of what lanes actually clear at.
 Revenue comes from products a carrier already buys — insurance, fuel, factoring —
-and from selling lane data to the broker side. See §8.
+and from selling lane data to the broker side. See §9.
 
 ### Non-goals
 
@@ -61,7 +61,7 @@ becomes something else:
 | **Owner-operator** (1–5 trucks — 80% of US carriers) | The next load, and to know if the rate is fair | Truck availability, bids, self-declared MC/USDOT | Finds a load on their lane and can see it priced in context |
 | **Small fleet** (6–20 trucks) | Backhauls, less phone time | Multiple trucks, repeat bidding | Fills empty legs without calling around |
 | **Small shipper** | Capacity without a broker's spread | Loads, dates, equipment | Posts once and receives competing bids |
-| **Broker** | Coverage | Loads at volume | *Ambivalent by design — see §11* |
+| **Broker** | Coverage | Loads at volume | *Ambivalent by design — see §5.6* |
 
 **Primary persona: the owner-operator.** They are the most numerous, the most
 underserved, and the most reachable. They are also the least able to pay a
@@ -108,7 +108,125 @@ a comment box.
 
 ---
 
-## 5. Requirements
+## 5. Persona journeys
+
+Section 4 describes the mechanics. This is what each persona actually does, screen
+by screen, and where the product currently stops short. Steps marked **[gap]** are
+not built.
+
+### 5.1 Marcus — owner-operator, one truck, Memphis
+
+His problem is the next load and whether the rate is fair. He has no dispatcher and
+no time.
+
+1. **Arrives** on a lane page from search — `/lane/mem-chi` ranks for
+   "Memphis to Chicago freight rates", which is the query he actually types.
+2. **Reads the rate before signing up.** Practical miles, last paid $/mi, the
+   30-day average and the spread against it are all public. This is the hook: he
+   learns something before being asked for anything.
+3. **Hits the identity wall.** Bid amounts are visible, but who bid is not —
+   *"Carrier name, MC/USDOT and safety record are visible to members."* This is the
+   deliberate conversion point.
+4. **Signs up as a carrier.** Name, phone, state/city, email, password — with a
+   generated-password option. MC and USDOT are optional and self-declared.
+5. **Lands on `/board`.** Filters to Freight, or searches naturally:
+   *"loads out of Memphis dry van"*.
+6. **Opens a load.** Sees the rate breakdown as arithmetic — `530 mi × $2.47` —
+   and every competing bid with the bidder's identity and a SAFER link.
+7. **Bids**, seeing his own implied $/mi as he types and how it sits against the
+   board rate.
+8. **Waits.** **[gap]** No notification when the poster responds; he must come back
+   and look.
+9. **Gets accepted** → both sides introduced by email → he calls the shipper. The
+   platform is out of it.
+10. **Rates the deal** afterwards, which attaches to that deal and no other.
+
+**Where it breaks for him today:** no alerts, no saved lanes, and no reason to
+return between visits. That is the retention problem, not an acquisition one.
+
+### 5.2 Rosa — fleet operator, 40 trucks, Laredo
+
+She runs capacity, not individual loads. Her lever is empty miles.
+
+1. **Signs up as a carrier, company** — org name, MC and USDOT filled in, because
+   for her they are credentials worth showing.
+2. **Posts a truck**, not a load: origin, destination, ready date, equipment. This
+   is the direction most boards do badly.
+3. **Receives bids from shippers** on her capacity — the market working in reverse.
+4. **Compares bidders** on the same public identity every carrier gets.
+5. **Accepts**, is introduced, deals direct.
+6. **Repeats across lanes.** **[gap]** No fleet view, no bulk posting, no per-truck
+   management. She is using a single-truck product with more trucks.
+
+**Where it breaks for her today:** everything above one truck. A fleet console is
+out of scope for v1 and she will feel it.
+
+### 5.3 Dana — small shipper, food distributor, Memphis
+
+She has freight and no broker relationship she trusts on price.
+
+1. **Signs up as a shipper**, company.
+2. **Posts a load** — origin and destination picked from a list so mileage is
+   computed rather than typed, equipment from 14 types plus custom, ready date,
+   optional target rate, notes.
+3. **Watches bids arrive**, each with a name, a company, a city, self-declared
+   MC/USDOT and a one-click SAFER lookup. She does the verifying; we say so plainly.
+4. **Counters** a bid she likes but not at that price.
+5. **Accepts** → introduction → she calls the carrier and books it herself.
+6. **Checks the lane page** later to see whether she paid over or under the board.
+
+**Where it breaks for her today:** she cannot see who bid on her own live listing
+until she expands it, there are no notifications, and — the real risk — **she is
+being asked to hand freight to carriers nobody has vetted.** §12 names this as the
+trust problem, and it is sharper for her than for anyone else on the board.
+
+### 5.4 Errol — first-timer, one shipment, no freight vocabulary
+
+He has a pallet to move and does not know what a reefer is.
+
+1. **Searches in plain language:**
+   *"how much to move some boxes from Seattle to Salt Lake City"* — parsed to
+   SEA → SLC, dry van, without him knowing either term.
+2. **Reads a lane page** written as prose, not a dashboard: what the lane pays,
+   over how many miles, against the 30-day average.
+3. **Posts a load** with dimensions rather than freight classes.
+4. **Receives bids** and is told, in the interface, that Overland verifies an email
+   address and nothing more — with SAFER one click away.
+
+**Where it breaks for him today:** he is the persona most exposed to a bad
+counterparty and least equipped to judge one. Everything we do to make FMCSA checks
+effortless is aimed at him.
+
+### 5.5 Priya — new carrier, no history
+
+Authority granted last month. No completed deals, no reviews.
+
+1. **Signs up**, USDOT present, MC not yet issued.
+2. **Bids** — and her card reads *"No completed deals on Overland yet."*
+3. **Is judged** on what does exist: authority age, city, and the SAFER link.
+
+**Why she matters:** every carrier starts here. If a zero-history profile reads as
+untrustworthy, the board cannot onboard anyone new, and a board that only works for
+incumbents is not an open board. The zero-state is a first-class design case, not
+an edge case.
+
+### 5.6 The broker — deliberately ambivalent
+
+A broker could post loads here at volume and solve our liquidity problem overnight.
+They will not, and the reason is structural rather than a UX failure.
+
+Public bid visibility converts a broker's information advantage into a race to the
+bottom on their buy side. Their margin *is* the spread we publish. On every board
+that works they are the highest-volume poster and the highest-paying customer —
+$109–$369 per user per month at Truckstop — and we are asking them to give that up.
+
+**We do not have a broker flow, and building one would mean weakening the
+transparency the product exists for.** The honest position is that our demand has
+to come shipper-direct, which is the hardest demand in freight to win, and §12
+records it as the top risk rather than hiding it.
+
+
+## 6. Requirements
 
 ### Must have — shipped
 
@@ -142,7 +260,7 @@ mobile apps.
 
 ---
 
-## 6. What has to be true
+## 7. What has to be true
 
 **One lane, genuinely liquid.** Roughly 10–15 loads a day in a single origin market
 and one equipment type, with competing bids on most of them.
@@ -157,7 +275,7 @@ reach through the public FMCSA census; loads are the scarce side.
 
 ---
 
-## 7. Success measures
+## 8. Success measures
 
 Registrations are a vanity number. The metric is **completed deals per active
 participant**, and whether it is rising.
@@ -172,7 +290,7 @@ participant**, and whether it is rising.
 
 ---
 
-## 8. Revenue
+## 9. Revenue
 
 Free to post, free to bid, no commission — permanently. Revenue sits beside the
 board, in products a carrier already buys.
@@ -195,7 +313,7 @@ quick-pay and factoring.
 
 ---
 
-## 9. Architecture constraints
+## 10. Architecture constraints
 
 - **Contacts never move into `profiles`.** Separate table, RLS keyed on an accepted
   deal. Do not create a view that joins them without that condition.
@@ -208,7 +326,7 @@ quick-pay and factoring.
 
 ---
 
-## 10. Open questions
+## 11. Open questions
 
 1. Why are `profiles` rows not being created on signup? Blocks carrier identity.
 2. Will small shippers post to a board where every bid is public? **Twenty
@@ -223,7 +341,7 @@ quick-pay and factoring.
 
 ---
 
-## 11. Risks
+## 12. Risks
 
 **The defining feature repels the paying side.** Brokers are the highest-volume
 posters on every board that works, and they pay the most. Public bidding converts
@@ -249,7 +367,7 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 
 ---
 
-## 12. Related
+## 13. Related
 
 [README.md](README.md) · [DESIGN.md](DESIGN.md) · [LEGAL-NOTES.md](LEGAL-NOTES.md) ·
 [supabase/SETUP.md](supabase/SETUP.md)
