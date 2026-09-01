@@ -98,7 +98,7 @@ table was empty and this migration had never run. Applied with
 | Withdraw own bid | `204`, removed nothing | works |
 
 **Test** — `src/lib/__tests__/db.policies.test.ts`, integration, skipped unless
-`VITE_SUPABASE_URL` is set:
+`SUPABASE_TEST_URL` and its test credentials are set:
 
 - owner bidding on own listing rejects
 - a bidder can delete their own bid; a stranger cannot

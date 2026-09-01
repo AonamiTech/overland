@@ -91,10 +91,10 @@ Mount `<AuthProvider>` inside `src/App.tsx`, wrapping `<BrowserRouter>`.
 
 There is no backend. Two acceptable paths — **pick one and say which in your notes**:
 
-- **Supabase Auth (recommended for real signups today).** Free tier, email+password,
-  hosted sessions. Add `@supabase/supabase-js`, keys in `.env` as
-  `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`, and **add `.env` to `.gitignore`**.
-  Store `role`, `mcNumber`, `usdotNumber` in `user_metadata`.
+- **Supabase Auth (implemented).** Email+password, magic-link, and Google sessions use
+  the public client configuration in `src/auth/supabaseConfig.ts`. Store `role`,
+  `mcNumber`, and `usdotNumber` in `user_metadata`; never put a `service_role`
+  key in browser code.
 - **Local-only mock.** `localStorage` session, seeded demo accounts. Faster, but nobody
   can actually register.
 

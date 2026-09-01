@@ -378,10 +378,10 @@ nothing fires locally.
   **promise**, not the client, deliberately — caching the client let concurrent
   callers each build a `GoTrueClient` on one storage key, which is fatal under
   PKCE.
-- Do not attempt a code fix for Google sign-in. The outbound leg is correct; the
-  return fails with `Unable to exchange external code`, which means the Client
-  Secret in Supabase does not match Google Cloud Console. It is a console
-  mismatch, and the app already degrades gracefully via `overland.google_broken`.
+- Google provider failures are external configuration issues: the outbound leg can be
+  correct while the return fails with `Unable to exchange external code` if the
+  Supabase Client Secret does not match Google Cloud Console. The app reports that
+  failure, keeps email sign-in available, and leaves the Google option visible.
 - Do not remove any of the four Post buttons without asking. The Lane index one
   was specifically requested.
 - Do not add a feature that is not in this document.
