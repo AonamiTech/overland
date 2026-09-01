@@ -16,6 +16,7 @@ const TAGLINE = 'Freight and trucks, priced in the open';
 const TITLES: Record<string, [string, string]> = {
   '/':                       [TAGLINE, 'An open board for US freight. Post a load or a truck, take open bids, and deal direct. Free to use, no fees.'],
   '/terms':                  ['Terms of use', 'How Overland works, and why it is not a freight broker.'],
+  '/privacy':                ['Privacy policy', 'What data Overland collects, how it is used, and how to request deletion.'],
   '/board':                  ['Rate board', 'Live lane rates across US freight lanes. Rate per mile, 30-day averages and open bids.'],
 };
 

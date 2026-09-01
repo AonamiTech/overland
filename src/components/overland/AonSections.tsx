@@ -675,7 +675,10 @@ export function AonFooter() {
           OVERLAND
         </span>
         <div className="flex flex-col gap-3 sm:items-end">
-          <a href="/terms" className="aon-eyebrow" style={{ color: 'rgba(250,249,247,.55)' }}>Terms</a>
+          <div className="flex gap-4">
+            <a href="/terms" className="aon-eyebrow" style={{ color: 'rgba(250,249,247,.55)' }}>Terms</a>
+            <a href="/privacy" className="aon-eyebrow" style={{ color: 'rgba(250,249,247,.55)' }}>Privacy</a>
+          </div>
           {/* Stated in the footer of every page, not buried in the terms. */}
           <p className="aon-eyebrow max-w-[52ch] sm:text-right" style={{ color: 'rgba(250,249,247,.3)', lineHeight: 1.9 }}>
             Overland is not a freight broker. We list, connect and step out. We take no

@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 
 const AuthDialog = lazy(() => import("./components/overland/AuthDialog"));
 const TermsPage = lazy(() => import("./pages/TermsPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const BoardPage = lazy(() => import("./pages/BoardPage"));
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/lane/:slug" element={<BoardPage />} />
                 <Route path="/board" element={<RequireAuth><BoardPage /></RequireAuth>} />
                 <Route path="*" element={<NotFound />} />
