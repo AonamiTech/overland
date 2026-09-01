@@ -26,8 +26,7 @@ both.
 | **Card radius** | `9px` | `18px` |
 | **Button shape** | pill, `999px` | rounded rect |
 
-Both are live in production. `.ov-*` is not dead code — roughly 100 components and
-24 routes still use it.
+All 24 legacy `.ov-*` routes and their component trees have been removed. All surviving routes (`/`, `/terms`, `/board`, `/lane/:slug`) belong to `.aon-*`.
 
 ### Which layer applies where
 
@@ -36,11 +35,9 @@ Both are live in production. `.ov-*` is not dead code — roughly 100 components
 | `/` | `.aon-*` | Marketing homepage |
 | `/board` | `.aon-*` | The product |
 | `/lane/:slug` | `.aon-*` | Public lane pages |
-| `/terms` | `.aon-*` | |
-| `/broker-dashboard`, `/fleet-dashboard`, `/corporate-*`, `/post-loads`, `/hire-trucks`, `/settings`, and ~18 more | `.ov-*` | Legacy TruckHai surfaces |
+| `/terms` | `.aon-*` | Terms of use |
 
-Everything under `src/components/overland/` is `.aon-*`. Everything else is
-generally `.ov-*`.
+All components under `src/components/overland/` use `.aon-*`.
 
 ### Three components never converted
 

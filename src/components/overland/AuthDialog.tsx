@@ -208,7 +208,7 @@ export default function AuthDialog() {
               {returning
                 ? 'Email and password. Nothing else to dig out.'
                 : !emailOpen
-                  ? 'Free, no commission. Sign up in under a minute, or sign in if you are already on.'
+                  ? 'Free to use. Sign up in under a minute, or sign in if you are already on.'
                   : method === 'password'
                     ? 'Pick a password or let us generate one. Your browser can remember it.'
                     : 'No password. You verify the address is real and stop there.'}

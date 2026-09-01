@@ -5,6 +5,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/(broker-dashboard|fleet-dashboard|corporate-dashboard|post-loads|hire-trucks|post-truck|fleet-management|gps-tracking|fleet-support|reports-analytics|settings|fleet-settings|corporate-bidding-exchange|broker-bidding-exchange|fleet-bidding-exchange|corporate-bidding|corporate/post-load|corporate/bulk-upload|corporate/erp-integration|corporate/live-tracking|corporate/insurance-hub|corporate/bidding-dashboard|corporate/analytics|corporate/settings)",
+      "destination": "/api/gone"
+    },
+    {
       "source": "/((?!api/|assets/).*)",
       "destination": "/index.html"
     }

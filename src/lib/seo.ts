@@ -47,7 +47,7 @@ export function laneAnswers(l: LaneSeo): Array<[string, string]> {
     [
       `How do I find a truck for ${l.origin} to ${l.dest}?`,
       `Post the load on Overland and carriers bid on it in the open. Every bid is visible, ` +
-      `there is no broker in the middle, and Overland takes no commission. ` +
+      `there is no broker in the middle, and Overland charges no platform fees. ` +
       `When you accept a bid both sides get each other's contact details by email.`,
     ],
     [
