@@ -21,7 +21,7 @@ describe('boardCounts', () => {
   it('uses head: true, count: exact so no rows cross the wire when live', async () => {
     const listingsQuery = {
       eq: vi.fn().mockReturnThis(),
-      gt: vi.fn().mockResolvedValue({ count: 14, error: null }),
+      or: vi.fn().mockResolvedValue({ count: 14, error: null }),
     };
     const selectListingsSpy = vi.fn().mockReturnValue(listingsQuery);
 

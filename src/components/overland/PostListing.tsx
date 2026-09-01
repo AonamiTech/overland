@@ -93,7 +93,14 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
       setDone(true);
       onPosted?.();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Could not post. Try again.');
+      const msg = e instanceof Error ? e.message : 'Could not post. Try again.';
+      if (msg.includes('P0001') || msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('limit')) {
+        setErr('Hourly rate limit reached (maximum 20 listings per hour).');
+      } else if (msg.toLowerCase().includes('notes')) {
+        setErr('Notes must be under 500 characters.');
+      } else {
+        setErr(msg);
+      }
     } finally {
       setBusy(false);
     }

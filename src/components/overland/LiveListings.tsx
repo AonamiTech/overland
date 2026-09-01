@@ -296,7 +296,18 @@ function BidSheet({ row, onClose, onDone }: { row: Row; onClose: () => void; onD
       await placeBid(row.id, user.id, Math.round(n), note.trim() || undefined);
       onDone();
     } catch (e2) {
-      setErr(e2 instanceof Error ? e2.message : 'Could not place the bid.');
+      const msg = e2 instanceof Error ? e2.message : 'Could not place the bid.';
+      if (msg.includes('P0001') || msg.toLowerCase().includes('rate limit') || msg.toLowerCase().includes('limit')) {
+        setErr('Hourly limit reached (maximum 60 bids per hour).');
+      } else if (msg.toLowerCase().includes('own listing') || msg.toLowerCase().includes('self')) {
+        setErr('You cannot bid on your own listing.');
+      } else if (msg.toLowerCase().includes('note')) {
+        setErr('Note must be under 500 characters.');
+      } else if (msg.toLowerCase().includes('amount')) {
+        setErr('Bid amount must be between $1 and $1,000,000.');
+      } else {
+        setErr(msg);
+      }
     } finally { setBusy(false); }
   };
 

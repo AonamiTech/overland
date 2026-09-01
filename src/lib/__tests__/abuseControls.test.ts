@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fetchListings, boardCounts, fetchBids, reportContent } from '../db';
+import { fetchListings, fetchBids, reportContent } from '../db';
 import * as supabaseClient from '@/auth/supabaseClient';
 
 describe('Task 4 Abuse Controls & DB Filters', () => {
@@ -35,14 +35,14 @@ describe('Task 4 Abuse Controls & DB Filters', () => {
     const mockSelect = vi.fn().mockReturnThis();
     const mockEq1 = vi.fn().mockReturnThis();
     const mockEq2 = vi.fn().mockReturnThis();
-    const mockGt = vi.fn().mockReturnThis();
+    const mockOr = vi.fn().mockReturnThis();
     const mockOrder = vi.fn().mockResolvedValue({ data: [], error: null });
 
     const mockSb = {
       from: vi.fn().mockReturnValue({
         select: mockSelect,
         eq: mockEq1,
-        gt: mockGt,
+        or: mockOr,
         order: mockOrder,
       }),
     };
@@ -50,8 +50,8 @@ describe('Task 4 Abuse Controls & DB Filters', () => {
     // Chain setup
     mockSelect.mockReturnValue({ eq: mockEq1 });
     mockEq1.mockReturnValue({ eq: mockEq2 });
-    mockEq2.mockReturnValue({ gt: mockGt });
-    mockGt.mockReturnValue({ order: mockOrder });
+    mockEq2.mockReturnValue({ or: mockOr });
+    mockOr.mockReturnValue({ order: mockOrder });
 
     vi.spyOn(supabaseClient, 'getSupabase').mockResolvedValue(mockSb as any);
 
@@ -65,7 +65,7 @@ describe('Task 4 Abuse Controls & DB Filters', () => {
       expect(mockSb.from).toHaveBeenCalledWith('listings');
       expect(mockEq1).toHaveBeenCalledWith('status', 'open');
       expect(mockEq2).toHaveBeenCalledWith('hidden', false);
-      expect(mockGt).toHaveBeenCalledWith('expires_at', expect.any(String));
+      expect(mockOr).toHaveBeenCalledWith(expect.stringContaining('expires_at.is.null'));
     } finally {
       (import.meta.env as any).VITE_SUPABASE_URL = origUrl;
       (import.meta.env as any).VITE_SUPABASE_ANON_KEY = origKey;

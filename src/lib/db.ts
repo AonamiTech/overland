@@ -75,7 +75,7 @@ export async function fetchListings(kind?: ListingKind): Promise<Listing[]> {
     .select('*')
     .eq('status', 'open')
     .eq('hidden', false)
-    .gt('expires_at', now)
+    .or(`expires_at.is.null,expires_at.gt.${now}`)
     .order('created_at', { ascending: false });
   if (kind) q = q.eq('kind', kind);
   const { data, error } = await q;
@@ -101,7 +101,7 @@ export async function boardCounts(): Promise<{ loads: number; bids: number } | n
     const c = await sb();
     const now = new Date().toISOString();
     const [l, b] = await Promise.all([
-      c.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('hidden', false).gt('expires_at', now),
+      c.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'open').eq('hidden', false).or(`expires_at.is.null,expires_at.gt.${now}`),
       c.from('bids').select('id', { count: 'exact', head: true }).eq('hidden', false),
     ]);
     return { loads: l.count ?? 0, bids: b.count ?? 0 };
