@@ -1,4 +1,23 @@
 /* ============================================================================
+   NOT IMPORTED — and must not be, until index.css is tokenised.
+   ----------------------------------------------------------------------------
+   This file was briefly imported into main.tsx (Task 11) and broke the homepage
+   for every visitor whose OS is set to dark. The cause: index.css and the
+   product components hardcode light values — #FAF9F7, #FFFFFF, #111111 appear
+   17 times in index.css and 30 times across components/overland — while this
+   file flips its tokens under prefers-color-scheme: dark. Importing it gives a
+   dark page ground with the hardcoded dark ink still on top.
+
+   Measured on the homepage at the time: 147 elements below 3:1 contrast, several
+   at exactly 1.00 — "Post", "Bid", "Connect" and "Here is how it works" rendered
+   #0E1113 on #111111, i.e. invisible. Light mode: 0 failures.
+
+   Adopting this file is a real task, not an import: convert index.css and the
+   hardcoded component colours to these tokens FIRST, then import, then re-measure
+   contrast in both schemes. Until then it stays a reference.
+   ============================================================================ */
+
+/* ============================================================================
    Overland product theme
    ----------------------------------------------------------------------------
    A portable extraction of the `.aon-*` layer that the live product uses: the
