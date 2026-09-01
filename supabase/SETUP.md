@@ -69,3 +69,37 @@ by calling the API directly. Keep it that way: never move `email` or `phone` int
 `ratings` has a unique constraint on `(deal_id, rater_id)` and an insert policy
 requiring a matching `deals` row. You cannot rate someone you never transacted with,
 which is what keeps the reputation layer meaningful rather than a comment box.
+
+---
+
+## 4. Email Notifications (Edge Function)
+
+Transactional emails on deal acceptance are driven by the `send-deal-email` edge function.
+
+### Environment Secrets required:
+Set the following secrets in Supabase Dashboard → **Project Settings** → **Edge Functions**:
+
+```bash
+# Option A: Resend API Key (Recommended)
+supabase secrets set RESEND_API_KEY=re_123456789
+
+# Option B: Standard SMTP Credentials
+supabase secrets set SMTP_HOST=smtp.sendgrid.net
+supabase secrets set SMTP_USER=apikey
+supabase secrets set SMTP_PASS=your_smtp_password
+supabase secrets set SMTP_FROM="Overland <notifications@overland.com>"
+```
+
+### Deploying the Edge Function:
+```bash
+supabase functions deploy send-deal-email
+```
+
+### Webhook / Database Trigger:
+In Supabase Dashboard → **Database** → **Webhooks**, create a Webhook:
+- **Table:** `public.deals`
+- **Events:** `INSERT`
+- **Target:** HTTP Request to `https://<your-project-ref>.supabase.co/functions/v1/send-deal-email`
+
+If credentials are absent, the edge function logs `[WARN]` and returns `{ status: "skipped" }` without interrupting the transaction.
+
