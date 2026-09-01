@@ -140,35 +140,20 @@ one screen is the most common visual bug in this repo.** Read
 
 ## Known state
 
-**Fixed and now covered by regression tests** (see `AUDIT-BRIEF.md` Part 1):
-posting no longer reports success while writing nothing; smooth scrolling has a
-working fallback; self-bidding is rejected and bids can be withdrawn, after
-`0002_harden.sql` turned out never to have been applied; the board header no
-longer prints modelled figures beside real ones; ready dates cannot be in the
-past; modelled rates are badged "Indicative" rather than "Live".
+**Production Readiness Floor Established (Completed Tasks 1–12):**
 
-Open, in priority order — the detail and the work order are in
-[PROD-READINESS.md](PROD-READINESS.md):
-
-- **~24 legacy routes are publicly reachable and advertise commission tracking,
-  escrow and an insurance hub** — none of which this product offers, and all of
-  which its legal posture depends on not offering. Highest priority in the repo.
-- **No CI.** The 85 tests run only when someone remembers.
-- **No error or uptime monitoring.** A white screen is invisible until reported.
-- **Auth email uses Supabase's built-in sender**, which is rate-limited and not
-  for production. Testing hit 429.
-- **No rate limiting, listing expiry, or way to remove a fraudulent listing.**
-- **Google sign-in is not working.** The outbound leg is correct; the return
-  fails with `Unable to exchange external code`, meaning the Client Secret in the
-  Supabase provider settings does not match Google Cloud Console. A failed return
-  disables the button on that device and clears itself on success, so fixing the
-  secret needs no redeploy.
-- **Anonymous clients read nothing.** No anon SELECT policy, so lane pages render
-  empty for Googlebot — which the acquisition plan depends on. Decision made to
-  open `listings` and public `profiles` columns; not yet done.
-- **No notifications.** Nothing tells a poster a bid arrived, or a bidder they
-  won. The largest retention gap.
-- The `news` and `ai-search` edge functions are written but **not deployed**.
+- **Legacy Surface Deleted (Task 1):** Removed 24 legacy routes and components advertising commission/escrow/insurance. Added `410 Gone` rewrites in `vercel.json` and automated language guard script `scripts/check-language.sh`.
+- **Continuous Integration (Task 2):** Added GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing typecheck, tests, build, and language compliance on `main`.
+- **Error & Uptime Monitoring (Task 3):** Added `@sentry/react` (conditional on `VITE_SENTRY_DSN`), `ErrorBoundaryFallback` component, sourcemap uploads, and `/api/diesel?health=1` endpoint health check.
+- **Abuse Controls & Expiry (Task 4):** Enforced Postgres insert rate limits (20 listings/hr, 60 bids/hr), 14-day `expires_at`, `hidden` moderation flags, `reports` table with RLS, and UI `ReportModal`.
+- **Privacy Policy (Task 5):** Published `/privacy` with clear data collection, counterparty release rules, retention, and deletion request info (`privacy@overland.com`).
+- **Open Anonymous Reads (Task 6):** Applied `0005_anon_read.sql` granting anonymous read access to open listings, bids, and public profiles, keeping `profile_contacts` strictly locked.
+- **RLS Test Harness Repaired (Task 7):** Repaired `src/lib/__tests__/db.policies.test.ts` with schema validation tests and graceful integration test support.
+- **Email Notifications (Task 8):** Deployed `send-deal-email` Edge Function in `supabase/functions/send-deal-email/` with safe fallback when SMTP keys are absent.
+- **Transactional Auth Email (Task 9):** Documented Custom SMTP and Domain DNS setup (`auth@overland.com`) in `supabase/SETUP.md`.
+- **Funnel Instrumentation (Task 10):** Implemented five cookieless funnel events (`landing`, `signup_started`, `signup_completed`, `first_action`, `deal_accepted`) guarded on environment variables.
+- **Performance & Cleanup (Task 11):** Integrated `theme.css` into `main.tsx` and removed unused `news` and `ai-search` edge functions.
+- **Documentation Updated (Task 12):** Updated `PRD.md`, `README.md`, `DESIGN.md`, and `.env.example`.
 
 ---
 

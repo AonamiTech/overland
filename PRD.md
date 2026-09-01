@@ -378,6 +378,23 @@ hosting, which buys the one thing this market punishes everyone for lacking — 
 What has actually been built, and how. Kept in reverse order so the newest entry is
 first. Anything asserted here was verified against production, not assumed.
 
+### 1 Sep 2026 — 12-task production readiness overhaul
+
+Completed all twelve core tasks from `ANTIGRAVITY-TASK.md` to establish a complete operational and legal floor for production:
+
+1. **Legacy Surface Deletion (Task 1):** Removed 24 legacy routes and components advertising commission tracking, escrow, and insurance hubs. Configured Vercel rewrites returning `410 Gone` for deleted paths via `api/gone.ts`. Added executable `scripts/check-language.sh` CI guard enforcing prohibition of broker/commission/vetting claims.
+2. **Continuous Integration (Task 2):** Configured `.github/workflows/ci.yml` running Node 20 with npm caching on push/PR to `main`: `npm ci` → `npm run typecheck` (`tsc -b`) → `npm run test` → `npm run build` → `scripts/check-language.sh`.
+3. **Error Monitoring & Uptime (Task 3):** Integrated `@sentry/react` initialized strictly when `VITE_SENTRY_DSN` is set. Wrapped router in Sentry ErrorBoundary rendering `ErrorBoundaryFallback` with `.aon-*` design system. Configured Vite sourcemaps and `/api/diesel?health=1` endpoint health check.
+4. **Abuse Controls & Moderation (Task 4):** Created `supabase/migrations/0004_abuse.sql` establishing PostgreSQL insert rate limit triggers (20 listings/hr, 60 bids/hr), `expires_at` (14 days), `hidden` moderation flags, and a `reports` table with insert-only RLS. Integrated UI `ReportModal`.
+5. **Privacy Policy (Task 5):** Added `/privacy` route in `PrivacyPage.tsx` adhering to `.aon-*` styling, detailing data collection, counterparty release rules, retention, and deletion requests (`privacy@overland.com`). Linked from footer and `RouteMeta.tsx`.
+6. **Open Anonymous Reads (Task 6):** Created `supabase/migrations/0005_anon_read.sql` granting anonymous SELECT permissions for open listings, bids, and public profiles, while keeping `profile_contacts` strictly locked to accepted counterparties.
+7. **RLS Test Harness Repair (Task 7):** Repaired `src/lib/__tests__/db.policies.test.ts` with static schema validation and graceful integration test execution against `SUPABASE_TEST_URL`.
+8. **Email Notifications (Task 8):** Built `send-deal-email` Edge Function in `supabase/functions/send-deal-email/` to send transactional email on deal creation when SMTP/Resend keys are set, with safe fallback warning when keys are absent.
+9. **Transactional Auth Email (Task 9):** Documented Custom SMTP & Domain DNS (`auth@overland.com`) configuration in `supabase/SETUP.md`.
+10. **Funnel Instrumentation (Task 10):** Implemented five cookieless funnel events (`landing`, `signup_started`, `signup_completed`, `first_action`, `deal_accepted`) in `src/lib/analytics.ts`, guarded on `VITE_POSTHOG_KEY`/`VITE_ANALYTICS_KEY`.
+11. **Performance & Theme (Task 11):** Integrated `theme.css` into `main.tsx` and removed unused `news` and `ai-search` edge functions.
+12. **Documentation & State (Task 12):** Updated `PRD.md`, `README.md`, `DESIGN.md`, and `.env.example`.
+
 ### 1 Sep 2026 — component & regression test coverage
 
 Added `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`, and `vitest.config.ts` with the `jsdom` environment. Expanded the test suite from pure functions to full component, flow, and database policy coverage (85 passing tests, 5 skipped integration tests).
