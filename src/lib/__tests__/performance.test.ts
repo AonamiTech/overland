@@ -2,12 +2,10 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Task 11 Performance and Edge Functions', () => {
-  it('src/theme.css is NOT imported in main.tsx', () => {
-    const mainPath = path.resolve(process.cwd(), 'src/main.tsx');
-    const code = fs.readFileSync(mainPath, 'utf8');
-
-    expect(code).not.toMatch(/import '\.\/theme\.css';/);
+describe('Task 8 Theme Resolution & Edge Functions', () => {
+  it('src/theme.css is deleted to prevent unimported theme footguns', () => {
+    const themePath = path.resolve(process.cwd(), 'src/theme.css');
+    expect(fs.existsSync(themePath)).toBe(false);
   });
 
   it('news edge function is restored as live production code and ai-search remains un-deployed', () => {
