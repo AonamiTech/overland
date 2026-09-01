@@ -112,7 +112,8 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
   return (
     <div className="fixed inset-0 z-[95] overflow-y-auto" style={{ background: 'rgba(17,17,17,.45)' }} onClick={onClose}>
       <div className="mx-auto my-6 w-full max-w-[520px] px-4" onClick={(e) => e.stopPropagation()}>
-        <div className="relative rounded-[9px] bg-white p-7" style={{ border: `1px solid ${HAIR}` }}>
+        <div className="relative rounded-[9px] bg-white p-7" style={{ border: `1px solid ${HAIR}` }}
+             role="dialog" aria-modal="true" aria-labelledby="post-listing-title">
           <button type="button" onClick={onClose} aria-label="Close"
                   className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full hover:bg-[rgba(17,17,17,.06)]"
                   style={{ color: 'rgba(17,17,17,.45)', fontSize: 20, lineHeight: 1 }}>×</button>
@@ -120,7 +121,7 @@ export default function PostListing({ onClose, onPosted }: { onClose: () => void
           {done ? (
             <>
               <span className="aon-eyebrow" style={{ color: ACCENT }}>Posted</span>
-              <h2 className="aon-display mt-2 text-[24px]">
+              <h2 id="post-listing-title" className="aon-display mt-2 text-[24px]">
                 {CITIES[from].name} → {CITIES[to].name}
               </h2>
               <p className="aon-body mt-4 text-[14px] leading-[1.7]">

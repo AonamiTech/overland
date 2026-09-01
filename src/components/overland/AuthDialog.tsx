@@ -172,6 +172,9 @@ export default function AuthDialog() {
           either. overscroll-contain stops the scroll chaining to the page underneath. */}
       <div
         className="relative max-h-[92svh] w-full max-w-[430px] overflow-y-auto overscroll-contain rounded-t-[16px] bg-white p-7 pb-[calc(28px+env(safe-area-inset-bottom))] sm:max-h-[88svh] sm:rounded-[9px] sm:pb-7"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-dialog-title"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -186,7 +189,7 @@ export default function AuthDialog() {
         {sent ? (
           <>
             <span className="aon-eyebrow" style={{ color: ACCENT }}>Check your inbox</span>
-            <h2 className="aon-display mt-3 text-[26px]">We sent you a link.</h2>
+            <h2 id="auth-dialog-title" className="aon-display mt-3 text-[26px]">We sent you a link.</h2>
             <p className="aon-body mt-4 text-[14px] leading-[1.7]">
               Open it from this device and you are on the board. The link is single use
               and expires in an hour.
@@ -198,7 +201,7 @@ export default function AuthDialog() {
         ) : (
           <>
             <span className="aon-eyebrow" style={{ color: ACCENT }}>Join the board</span>
-            <h2 className="aon-display mt-3 text-[26px]">
+            <h2 id="auth-dialog-title" className="aon-display mt-3 text-[26px]">
               {returning ? 'Welcome back.'
                 : !emailOpen ? 'Join the board.'
                 : method === 'password' ? 'Create your account.'
