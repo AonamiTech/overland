@@ -59,6 +59,11 @@ them without the accepted-deal condition.
 | Tests | Vitest |
 | Hosting | Vercel |
 
+### Deployed Edge Functions
+- `news` (`supabase/functions/news/index.ts`): Active on Supabase; fetches and caches RSS market headlines for the homepage.
+- `send-deal-email` (`supabase/functions/send-deal-email/index.ts`): Active on Supabase; handles transactional deal notifications.
+- *(Note: Unused prototype `ai-search` was deleted from the repository as it was never deployed nor referenced).*
+
 ---
 
 ## Running it
