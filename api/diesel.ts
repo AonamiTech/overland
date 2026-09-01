@@ -23,10 +23,23 @@ const SERIES =
  *  published price as cost per mile, which is the unit freight is priced in. */
 const MPG = 6.5;
 
-export default async function handler(req: unknown, res: {
+type ApiReq = { url?: string };
+type ApiRes = {
   setHeader(k: string, v: string): void;
   status(c: number): { json(b: unknown): void };
-}) {
+};
+
+export default async function handler(req: ApiReq, res: ApiRes) {
+  const url = req?.url ?? '';
+  if (url.includes('health=1') || url.includes('health=true')) {
+    res.status(200).json({
+      status: 'ok',
+      endpoint: 'diesel',
+      configured: Boolean(process.env.EIA_API_KEY),
+    });
+    return;
+  }
+
   const key = process.env.EIA_API_KEY;
   if (!key) {
     res.status(503).json({ error: 'Diesel feed is not configured.' });
