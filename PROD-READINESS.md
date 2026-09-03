@@ -1,6 +1,6 @@
 # Production readiness — work order 2
 
-Repository: `~/Downloads/overland` · Live: `https://overland-5c4.pages.dev`
+Repository: `~/Downloads/overland` · Live: `https://overland.aonamitech.com`
 Written: 1 Sep 2026 · Supersedes nothing in `AUDIT-BRIEF.md`; that work is done
 
 ---

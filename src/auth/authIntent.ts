@@ -8,7 +8,7 @@
 export const DEFAULT_AUTH_RETURN_TO = '/board';
 export const AUTH_RETURN_PARAM = 'overland_return_to';
 export const AUTH_ROLE_PARAM = 'overland_role';
-export const CANONICAL_APP_ORIGIN = 'https://overland-5c4.pages.dev';
+export const CANONICAL_APP_ORIGIN = 'https://overland.aonamitech.com';
 
 const STORAGE_KEY = 'overland.auth.intent.v1';
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;

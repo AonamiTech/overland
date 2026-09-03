@@ -121,12 +121,12 @@ serve(async (req: Request) => {
     if (eventType === 'bid_placed') {
       subject = `New Bid Placed: ${listing.origin} → ${listing.dest} ($${rec.amount ?? 0})`;
       text = `A new bid of $${rec.amount ?? 0} was placed on your listing (${listing.origin} → ${listing.dest}).\n\n` +
-        `Sign in to Overland to review bids and connect: https://overland-5c4.pages.dev/board\n\n` +
+        `Sign in to Overland to review bids and connect: https://overland.aonamitech.com/board\n\n` +
         `To stop email notifications, update your notification settings in your profile.`;
     } else {
       subject = `Bid Accepted: ${listing.origin} → ${listing.dest} ($${rec.amount ?? 0})`;
       text = `Your bid of $${rec.amount ?? 0} for ${listing.origin} → ${listing.dest} was accepted!\n\n` +
-        `You can now connect directly with the load poster on Overland: https://overland-5c4.pages.dev/board\n\n` +
+        `You can now connect directly with the load poster on Overland: https://overland.aonamitech.com/board\n\n` +
         `Overland is a listing board and is not a broker, does not handle payment, and takes no commission.\n\n` +
         `To stop email notifications, update your notification settings in your profile.`;
     }

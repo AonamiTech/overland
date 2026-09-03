@@ -3,7 +3,7 @@
 An open freight board for US trucking. Shippers post loads, carriers post trucks,
 and either side bids on the other. Every bid is public.
 
-**Live:** [overland-5c4.pages.dev](https://overland-5c4.pages.dev)
+**Live:** [overland.aonamitech.com](https://overland.aonamitech.com)
 
 ---
 

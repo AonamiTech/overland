@@ -3,7 +3,7 @@
   "redirects": [
     {
       "source": "/:path*",
-      "destination": "https://overland-5c4.pages.dev/:path*",
+      "destination": "https://overland.aonamitech.com/:path*",
       "permanent": false
     }
   ]

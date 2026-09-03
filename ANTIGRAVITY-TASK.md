@@ -1,6 +1,6 @@
 # Work order: make Overland production-functional
 
-Repository: `~/Downloads/overland` · Live: `https://overland-5c4.pages.dev`
+Repository: `~/Downloads/overland` · Live: `https://overland.aonamitech.com`
 Read `PROD-READINESS.md`, `DESIGN.md` and `LEGAL-NOTES.md` before starting.
 
 Twelve tasks, in dependency order. **Do them in order and do not batch them.**
@@ -123,7 +123,7 @@ were orphaned from the nav but never deleted.
 5. Re-read the surviving copy for implied vetting and remove any.
 
 **Acceptance:** `npm run build` clean; `scripts/check-language.sh` exits 0; after
-deploy, `curl -o /dev/null -w '%{http_code}' https://overland-5c4.pages.dev/broker-dashboard`
+deploy, `curl -o /dev/null -w '%{http_code}' https://overland.aonamitech.com/broker-dashboard`
 returns **410**; `/`, `/board`, `/lane/mem-chi` and `/api/diesel` all still work.
 
 **Bonus:** this also removes most of the `.ov-*` layer, which `DESIGN.md` calls

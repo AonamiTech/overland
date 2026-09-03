@@ -1,6 +1,6 @@
 # Work order 3
 
-Repository: `~/Downloads/overland` · Live: `https://overland-5c4.pages.dev`
+Repository: `~/Downloads/overland` · Live: `https://overland.aonamitech.com`
 Written: 1 Sep 2026, after verifying work order 2.
 
 Read `PRODUCTION_PROGRESS.md` first — the verification sections record what was
@@ -44,7 +44,7 @@ on any of:
 1. `git rev-parse HEAD` ≠ `git rev-parse origin/main` → "committed but not pushed"
 2. `supabase migration list --linked` has any row with a populated Local column
    and an empty Remote column → "migration written but not applied"
-3. The `assets/index-*.js` referenced by `curl https://overland-5c4.pages.dev/`
+3. The `assets/index-*.js` referenced by `curl https://overland.aonamitech.com/`
    ≠ the one in `dist/` after a fresh `npm run build` → "built but not deployed"
 4. Any file under `supabase/functions/` that `supabase functions list` does not
    show as ACTIVE → "function written but not deployed"

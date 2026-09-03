@@ -146,13 +146,13 @@ site, configure the Google button as follows:
    `https://sfhynjdpedrkgnbchvge.supabase.co/auth/v1/callback`.
 2. In Google Cloud Console, add that exact Supabase callback URL as an **Authorized
    redirect URI** for the OAuth web client. Add
-   `https://overland-5c4.pages.dev` as an Authorized JavaScript origin.
+   `https://overland.aonamitech.com` as an Authorized JavaScript origin.
 3. Copy the same OAuth client ID and client secret into the Supabase Google provider.
    A secret mismatch causes the return exchange to fail; it cannot be repaired from
    browser code.
 4. In Supabase **Authentication → URL Configuration**, set the Site URL to
-   `https://overland-5c4.pages.dev/` and allow these redirect URLs:
-   `https://overland-5c4.pages.dev/` and `https://overland-5c4.pages.dev/**`.
+   `https://overland.aonamitech.com/` and allow these redirect URLs:
+   `https://overland.aonamitech.com/` and `https://overland.aonamitech.com/**`.
    Overland adds a same-origin return-path query parameter to that root callback so a
    visitor returns to the page that opened sign-in.
 

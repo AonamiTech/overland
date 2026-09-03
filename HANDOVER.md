@@ -9,7 +9,7 @@ A React + Vite + TypeScript SPA. Originally an Indian "Truck Hai" freight templa
 | | |
 |---|---|
 | Source folder | `~/Downloads/overland` |
-| Live URL | https://overland-5c4.pages.dev |
+| Live URL | https://overland.aonamitech.com |
 | Vercel project | `overland` (account: `pratikkp24`) |
 
 ## Stack
