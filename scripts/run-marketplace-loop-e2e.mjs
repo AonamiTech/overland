@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://ulywxnfrkmhaucvgxofc.supabase.co';
-const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXd4bmZya21oYXVjdmd4b2ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MDE0NjQsImV4cCI6MjEwMzQ3NzQ2NH0.tSt1UZqboaBPHErmbOCVCLE3lu8qHHRvFcU3oWKR7tw';
+const SUPABASE_URL = 'https://sfhynjdpedrkgnbchvge.supabase.co';
+const ANON_KEY = 'sb_publishable_25EgjpjsY_seRNuUqLSd9A_PpznZywT';
 
 const rand = Math.floor(Math.random() * 90000) + 10000;
 const shipperEmail = `e2e-shipper-${rand}@overland.com`;

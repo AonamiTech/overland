@@ -128,10 +128,11 @@ In your DNS provider for `overland.com`, add:
 - **DMARC TXT Record:** `v=DMARC1; p=none; rua=mailto:dmarc@overland.com`
 
 ### 3. Client Configuration
-The browser client uses the production Supabase URL and anon key checked into
+The browser client uses the production Supabase URL and publishable key checked into
 `src/auth/supabaseConfig.ts`, so deployed builds do not need `VITE_SUPABASE_*`
-variables. The anon key is public and protected by RLS; never put a `service_role` key
-in client code. Local-mode branches remain available for isolated tests.
+variables. The publishable key is public and protected by RLS; never put a
+`service_role` or secret key in client code. Local-mode branches remain available for
+isolated tests.
 
 ---
 
@@ -142,7 +143,7 @@ site, configure the Google button as follows:
 
 1. In Supabase Dashboard → **Authentication → Providers → Google**, enable Google and
    copy the provider callback URL shown there. For this project it is
-   `https://ulywxnfrkmhaucvgxofc.supabase.co/auth/v1/callback`.
+   `https://sfhynjdpedrkgnbchvge.supabase.co/auth/v1/callback`.
 2. In Google Cloud Console, add that exact Supabase callback URL as an **Authorized
    redirect URI** for the OAuth web client. Add
    `https://overland-5c4.pages.dev` as an Authorized JavaScript origin.
